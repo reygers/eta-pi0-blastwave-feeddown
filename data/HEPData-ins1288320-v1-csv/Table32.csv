@@ -1,0 +1,24 @@
+#: table_doi: 10.17182/hepdata.66630.v1/t32
+#: name: Table 32
+#: description: pT-dependent ratio (p + anti-p)/phi(1020) in Pb-Pb collisions at sqrt(sNN)=2.76 TeV, centrality 80.0-90.0%.
+
+#: data_file: Table32.yaml
+#: keyword reactions: PB PB --> P X | PB PB --> PBAR X | PB PB --> PHI X
+#: keyword observables: SIG/SIG
+#: keyword phrases: Inclusive | Integrated Cross Section | Cross Section
+#: keyword cmenergies: 2760.0
+#: CENTRALITY [pct],,,80.0-90.0
+#: RE(P + PBAR),,,PB PB --> (P + PBAR) X
+#: RE(PHI),,,PB PB --> PHI < K- K+ > X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+PT [GEV],PT [GEV] LOW,PT [GEV] HIGH,SIG(P + PBAR)/SIG(PHI),stat +,stat -,sys +,sys -
+0.65,0.5,0.8,9.567,0.727,-0.727,1.197,-1.197
+0.9,0.8,1.0,7.218,0.41,-0.41,0.763,-0.763
+1.25,1.0,1.5,6.558,0.332,-0.332,0.587,-0.587
+1.75,1.5,2.0,4.664,0.411,-0.411,0.471,-0.471
+2.25,2.0,2.5,4.318,0.525,-0.525,0.501,-0.501
+2.75,2.5,3.0,3.162,0.372,-0.372,0.449,-0.449
+3.5,3.0,4.0,2.667,0.279,-0.279,0.448,-0.448
+4.3,4.0,4.6,1.72,0.342,-0.342,0.364,-0.364
+

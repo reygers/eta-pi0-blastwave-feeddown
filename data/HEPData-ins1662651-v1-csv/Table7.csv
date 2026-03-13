@@ -1,0 +1,26 @@
+#: table_doi: 10.17182/hepdata.83964.v1/t7
+#: name: Table 7
+#: description: Nuclear modification factor R_AA of $\eta$ produced in 0-10% central Pb-Pb collisions at sqrt{s_NN} = 2.76 TeV at mid-rapidity, T_AA uncertainty of 3.25% and uncertainty of \sigma_{inel} of 3.9% included in systematic uncertainties.
+
+#: data_file: Table7.yaml
+#: keyword reactions: PB PB --> ETA X
+#: keyword observables: RAA
+#: keyword phrases: Nuclear Modification Factor | Transverse Momentum Dependence | Lead-Lead Scattering | Eta Meson Production
+#: keyword cmenergies: 2760.0
+#: RE,,,PB PB --> ETA X
+#: CENTRALITY [PCT],,,0.0 TO 10.0
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,0.0
+PT [GEV/c],PT [GEV/c] LOW,PT [GEV/c] HIGH,RAA,stat +,stat -,sys +,sys -
+1.25,1.0,1.5,0.4982817,0.161066,-0.161066,0.1300107,-0.1300107
+1.75,1.5,2.0,0.4920547,0.1408247,-0.1408247,0.1051048,-0.1051048
+2.5,2.0,3.0,0.4423092,0.08443605,-0.08443605,0.0789167,-0.0789167
+3.5,3.0,4.0,0.2585696,0.05729917,-0.05729917,0.04812423,-0.04812423
+5.0,4.0,6.0,0.1101894,0.01320016,-0.01320016,0.01689691,-0.01689691
+7.0,6.0,8.0,0.1067985,0.009822699,-0.009822699,0.01579535,-0.01579535
+9.0,8.0,10.0,0.1404146,0.01446276,-0.01446276,0.02117097,-0.02117097
+11.0,10.0,12.0,0.1469927,0.01605335,-0.01605335,0.02652812,-0.02652812
+13.0,12.0,14.0,0.184809,0.02286597,-0.02286597,0.03505386,-0.03505386
+15.5,14.0,17.0,0.1725918,0.01824836,-0.01824836,0.03921231,-0.03921231
+18.5,17.0,20.0,0.2404827,0.03465175,-0.03465175,0.06079391,-0.06079391
+

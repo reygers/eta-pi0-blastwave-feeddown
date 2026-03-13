@@ -1,0 +1,38 @@
+#: table_doi: 10.17182/hepdata.66630.v1/t18
+#: name: Table 18
+#: description: Mass of phi(2010) mesons as a function of pT for central (0-10%, first y column) and peripheral (70-80%, second y column) Pb-Pb collisions at sqrt(sNN)=2.76 TeV.
+UPDATE (27 JAN 2015): replaced with the final published values.
+
+#: data_file: Table18.yaml
+#: keyword reactions: PB PB --> PHI X
+#: keyword observables: M
+#: keyword phrases: Inclusive | Strange production
+#: keyword cmenergies: 2760.0
+#: CENTRALITY [pct],,,0.0-10.0,,,,
+#: RE,,,PB PB --> PHI < K- K+ > X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+PT [GEV],PT [GEV] LOW,PT [GEV] HIGH,M [GEV],stat +,stat -,sys +,sys -
+0.65,0.5,0.8,1.0195,0.0001,-0.0001,0.0003,-0.0003
+0.9,0.8,1.0,1.01946,7e-05,-7e-05,0.00021,-0.00021
+1.25,1.0,1.5,1.01916,6e-05,-6e-05,0.00022,-0.00022
+1.75,1.5,2.0,1.0193,0.0001,-0.0001,0.0003,-0.0003
+2.25,2.0,2.5,1.0192,0.0002,-0.0002,0.0002,-0.0002
+2.75,2.5,3.0,1.0191,0.0002,-0.0002,0.0002,-0.0002
+3.5,3.0,4.0,1.0194,0.0002,-0.0002,0.0003,-0.0003
+4.5,4.0,5.0,1.0193,0.0003,-0.0003,0.0003,-0.0003
+
+#: CENTRALITY [pct],,,0.0-10.0,,,,
+#: RE,,,PB PB --> PHI < K- K+ > X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+PT [GEV],PT [GEV] LOW,PT [GEV] HIGH,M [GEV],stat +,stat -,sys +,sys -
+0.65,0.5,0.8,1.0192,0.0001,-0.0001,0.0003,-0.0003
+0.9,0.8,1.0,1.01967,9e-05,-9e-05,0.00022,-0.00022
+1.25,1.0,1.5,1.01948,7e-05,-7e-05,0.00012,-0.00012
+1.75,1.5,2.0,1.0193,0.0001,-0.0001,0.0002,-0.0002
+2.25,2.0,2.5,1.0191,0.0002,-0.0002,0.0002,-0.0002
+2.75,2.5,3.0,1.0192,0.0002,-0.0002,0.0003,-0.0003
+3.5,3.0,4.0,1.0194,0.0002,-0.0002,0.0002,-0.0002
+4.5,4.0,5.0,1.02,0.0003,-0.0003,0.0005,-0.0005
+

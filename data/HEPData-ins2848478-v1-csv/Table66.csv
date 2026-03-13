@@ -1,0 +1,23 @@
+#: table_doi: 10.17182/hepdata.160597.v1/t66
+#: name: Table 66
+#: description: Slope parameter (n) of a power-law fit ($f(p_{\rm T}) = \alpha p_{\rm T}^{-n}$) for $5 < p_{\rm T} < 15$ GeV/$c$ as a function the charged-particle multiplicity density in units of the average normalized multiplicity density for the INEL>0 event class for the eta meson.
+#: data_file: Table66.yaml
+#: keyword observables: D2N/DPT/DY/PT
+#: keyword reactions: P P --> $\eta$ + $X$
+#: keyword cmenergies: 13000.0
+#: RE,,,P P --> ETA X
+#: ABS(YRAP),,,<0.8
+#: SQRT(S) [GEV],,,13000.0
+$\langle dN_{ch}/d\eta\rangle_{mult}/\langle dN_{ch}/d\eta\rangle_{INEL>0}$,$\langle dN_{ch}/d\eta\rangle_{mult}/\langle dN_{ch}/d\eta\rangle_{INEL>0}$ LOW,$\langle dN_{ch}/d\eta\rangle_{mult}/\langle dN_{ch}/d\eta\rangle_{INEL>0}$ HIGH,slope parameter n of power-law fit,stat +,stat -,sys +,sys -
+0.366522,0.359041,0.374004,6.14604,0.0844894,-0.0844894,0.242263,-0.242263
+0.647908,0.635834,0.659981,5.97349,0.0598091,-0.0598091,0.120922,-0.120922
+1.0303,1.01062,1.04998,5.80523,0.0459719,-0.0459719,0.117254,-0.117254
+1.44733,1.42077,1.47389,5.77188,0.0451881,-0.0451881,0.116812,-0.116812
+1.86147,1.82703,1.89591,5.69746,0.0386374,-0.0386374,0.104968,-0.104968
+2.33478,2.29292,2.37664,5.76861,0.0443635,-0.0443635,0.101314,-0.101314
+2.88456,2.83354,2.93558,5.72675,0.0444068,-0.0444068,0.108418,-0.108418
+3.75325,3.68409,3.82241,5.77097,0.0660691,-0.0660691,0.183709,-0.183709
+4.34776,4.26905,4.42647,5.53671,0.0753288,-0.0753288,0.165535,-0.165535
+4.64791,4.56339,4.73243,5.4005,0.0805899,-0.0805899,0.141843,-0.141843
+5.16883,5.07341,5.26426,5.41265,0.113218,-0.113218,0.231692,-0.231692
+

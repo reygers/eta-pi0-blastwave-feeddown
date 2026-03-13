@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Jupyter / caches
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+
+# Build artifacts
+kernel_factory/kernel_factory
+*.o
+*.so
+*.dylib
+
+# ROOT / binary outputs
+*.root
+
+# HDF5 kernels and generated outputs
+kernels/*.h5
+outputs/
+paper/figures/
+!paper/figures/.gitkeep
+internal/figures/
+
+# Paper build products
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.log
+paper/*.out
+paper/*.pdf
+paper/*.synctex.gz
+
+# Temporary files
+tmp/
+*.tmp

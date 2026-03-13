@@ -1,0 +1,24 @@
+#: table_doi: 10.17182/hepdata.66630.v1/t34
+#: name: Table 34
+#: description: Enhancement ratio of phi(1020) for different centrality intervals in Pb-Pb collisions at sqrt(sNN)=2.76 TeV.  The enhancement ratio is the ratio of the yield of a particle in A-A collisions to the yield of the particle in pp collisions, scaled by the average number of participant nucleons:  Enhancement=[Yield(A-A)/<Npart(A-A)>]/[Yield(pp)/2].  The phi(1020) yield for pp collisions at sqrt(s)=2.76 TeV is interpolated between the measured yields at sqrt(s)=900 GeV and sqrt(s)=7 TeV.  In the tables, the first systematic uncertainty is the uncorrelated uncertainty from the Pb-Pb data, the second is the normalization uncertainty from the Pb-Pb data, and the third is from the uncertainty in <Npart>.  In the paper this ratio is plotted as a function of the <Npart> values taken from PRC 88, 044909 (2013).
+
+#: data_file: Table34.yaml
+#: keyword reactions: PB PB --> PHI X
+#: keyword observables: N/N
+#: keyword phrases: Inclusive | Strange production
+#: keyword cmenergies: 2760.0
+#: RE,,,PB PB --> PHI < K- K+ > X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+CENTRALITY [PCT],CENTRALITY [PCT] LOW,CENTRALITY [PCT] HIGH,Yield/MEAN(Npart) relative to pp,stat +,stat -,"sys,uncorrelated +","sys,uncorrelated -","sys,normalization +","sys,normalization -","sys,Npart +","sys,Npart -","sys,from Pb-Pb yield, correlated between centrality intervals, excluding normalization +","sys,from Pb-Pb yield, correlated between centrality intervals, excluding normalization -","sys,from pp interpolated yield +","sys,from pp interpolated yield -"
+2.5,0.0,5.0,2.719,0.091,-0.091,0.206,-0.206,0.014,-0.014,0.021,-0.021,10.05%,-10.05%,13.14%,-13.14%
+7.5,5.0,10.0,2.689,0.091,-0.091,0.185,-0.185,0.013,-0.013,0.035,-0.035,10.05%,-10.05%,13.14%,-13.14%
+15.0,10.0,20.0,2.632,0.063,-0.063,0.15,-0.15,0.018,-0.018,0.038,-0.038,10.05%,-10.05%,13.14%,-13.14%
+25.0,20.0,30.0,2.836,0.061,-0.061,0.166,-0.166,0.028,-0.028,0.05,-0.05,10.05%,-10.05%,13.14%,-13.14%
+35.0,30.0,40.0,2.519,0.056,-0.056,0.12,-0.12,0.05,-0.05,0.058,-0.058,10.05%,-10.05%,13.14%,-13.14%
+45.0,40.0,50.0,2.387,0.044,-0.044,0.112,-0.112,0.057,-0.057,0.069,-0.069,10.05%,-10.05%,13.14%,-13.14%
+55.0,50.0,60.0,2.145,0.045,-0.045,0.101,-0.101,0.075,-0.075,0.065,-0.065,10.05%,-10.05%,13.14%,-13.14%
+65.0,60.0,70.0,1.818,0.05,-0.05,0.079,-0.079,0.091,-0.091,0.06,-0.06,10.05%,-10.05%,13.14%,-13.14%
+75.0,70.0,80.0,1.494,0.051,-0.051,0.108,-0.108,0.1,-0.1,0.054,-0.054,10.05%,-10.05%,13.14%,-13.14%
+85.0,80.0,90.0,0.9836,0.0391,-0.0391,0.0732,-0.0732,0.118,-0.0836,0.0296,-0.0296,10.05%,-10.05%,13.14%,-13.14%
+

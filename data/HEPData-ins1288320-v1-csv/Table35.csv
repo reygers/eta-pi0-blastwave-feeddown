@@ -1,0 +1,21 @@
+#: table_doi: 10.17182/hepdata.66630.v1/t35
+#: name: Table 35
+#: description: Enhancement ratio of Lambda for different centrality intervals in Pb-Pb collisions at sqrt(sNN)=2.76 TeV.  The enhancement ratio is the ratio of the yield of a particle in A-A collisions to the yield of the particle in pp collisions, scaled by the average number of participant nucleons:  Enhancement=[Yield(A-A)/<Npart(A-A)>]/[Yield(pp)/2].  The Lambda yield for pp collisions at sqrt(s)=2.76 TeV is extrapolated from the measured yield at sqrt(s)=7 TeV.  In the tables, the first systematic uncertainty is the uncertainty from the Pb-Pb data and the second is from the uncertainty in <Npart>.  In the paper this ratio is plotted as a function of the <Npart> values taken from PRC 88, 044909 (2013).
+
+#: data_file: Table35.yaml
+#: keyword reactions: PB PB --> LAMBDA X
+#: keyword observables: N/N
+#: keyword phrases: Inclusive | Strange production
+#: keyword cmenergies: 2760.0
+#: RE,,,PB PB --> LAMBDA < PI- P > X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+CENTRALITY [PCT],CENTRALITY [PCT] LOW,CENTRALITY [PCT] HIGH,Yield/MEAN(Npart) relative to pp,stat +,stat -,"sys,PbPb +","sys,PbPb -","sys,Npart +","sys,Npart -","sys,from extrapolated pp yield +","sys,from extrapolated pp yield -"
+2.5,0.0,5.0,2.174,0.061,-0.061,0.23,-0.23,0.017,-0.017,19.43%,-19.43%
+7.5,5.0,10.0,2.129,0.061,-0.061,0.218,-0.218,0.028,-0.028,19.43%,-19.43%
+15.0,10.0,20.0,2.11,0.062,-0.062,0.229,-0.229,0.031,-0.031,19.43%,-19.43%
+30.0,20.0,40.0,2.023,0.066,-0.066,0.218,-0.218,0.04,-0.04,19.43%,-19.43%
+50.0,40.0,60.0,1.796,0.062,-0.062,0.194,-0.194,0.052,-0.052,19.43%,-19.43%
+70.0,60.0,80.0,1.428,0.05,-0.05,0.135,-0.135,0.049,-0.049,19.43%,-19.43%
+85.0,80.0,90.0,0.9289,0.1085,-0.1085,0.072,-0.072,0.0279,-0.0279,19.43%,-19.43%
+

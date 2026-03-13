@@ -1,0 +1,23 @@
+#: table_doi: 10.17182/hepdata.66630.v1/t12
+#: name: Table 12
+#: description: Transverse-momentum distributions of phi(1020) mesons in Pb-Pb collisions at sqrt(sNN)=2.76 TeV, centrality 50.0-60.0%.
+
+#: data_file: Table12.yaml
+#: keyword reactions: PB PB --> PHI X
+#: keyword observables: DN/DPT
+#: keyword phrases: Inclusive | Single Differential Distribution | Transverse Momentum Dependence | Strange production
+#: keyword cmenergies: 2760.0
+#: CENTRALITY [pct],,,50.0-60.0
+#: RE,,,PB PB --> PHI < K- K+ > X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+PT [GEV],PT [GEV] LOW,PT [GEV] HIGH,(1/Nev)*D2(N)/DPT/DYRAP [GEV**-1],stat +,stat -,"sys,uncorrelated +","sys,uncorrelated -","sys,normalization +","sys,normalization -","sys,other pT-correlated systematic uncertainties +","sys,other pT-correlated systematic uncertainties -"
+0.65,0.5,0.8,0.9015,0.0404,-0.0404,0.0754,-0.0754,3.5%,-3.5%,10.05%,-10.05%
+0.9,0.8,1.0,0.8779,0.0305,-0.0305,0.0512,-0.0512,3.5%,-3.5%,10.05%,-10.05%
+1.25,1.0,1.5,0.7358,0.0218,-0.0218,0.0619,-0.0619,3.5%,-3.5%,10.05%,-10.05%
+1.75,1.5,2.0,0.4593,0.0231,-0.0231,0.0607,-0.0607,3.5%,-3.5%,10.05%,-10.05%
+2.25,2.0,2.5,0.215,0.0136,-0.0136,0.0241,-0.0241,3.5%,-3.5%,10.05%,-10.05%
+2.75,2.5,3.0,0.0886,0.00622,-0.00622,0.00806,-0.00806,3.5%,-3.5%,10.05%,-10.05%
+3.5,3.0,4.0,0.03103,0.00174,-0.00174,0.0033,-0.0033,3.5%,-3.5%,10.05%,-10.05%
+4.5,4.0,5.0,0.01002,0.0006,-0.0006,0.00081,-0.00081,3.5%,-3.5%,10.05%,-10.05%
+

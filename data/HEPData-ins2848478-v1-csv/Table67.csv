@@ -1,0 +1,23 @@
+#: table_doi: 10.17182/hepdata.160597.v1/t67
+#: name: Table 67
+#: description: Slope parameter (k) of an exponential fit ($f(p_{\rm T}) = \alpha e^{-p_{\rm T}/k}$) for $1.5 < p_{\rm T} < 4$ GeV/$c$ as a function the charged-particle multiplicity density in units of the average normalized multiplicity density for the INEL>0 event class for the eta meson.
+#: data_file: Table67.yaml
+#: keyword observables: D2N/DPT/DY/PT
+#: keyword reactions: P P --> $\eta$ + $X$
+#: keyword cmenergies: 13000.0
+#: RE,,,P P --> ETA X
+#: ABS(YRAP),,,<0.8
+#: SQRT(S) [GEV],,,13000.0
+$\langle dN_{ch}/d\eta\rangle_{mult}/\langle dN_{ch}/d\eta\rangle_{INEL>0}$,$\langle dN_{ch}/d\eta\rangle_{mult}/\langle dN_{ch}/d\eta\rangle_{INEL>0}$ LOW,$\langle dN_{ch}/d\eta\rangle_{mult}/\langle dN_{ch}/d\eta\rangle_{INEL>0}$ HIGH,slope parameter k of exponential fit,stat +,stat -,sys +,sys -
+0.366522,0.359041,0.374004,0.8,6.72071e-05,-6.72071e-05,0.127364,-0.127364
+0.647908,0.635834,0.659981,0.705725,0.0165446,-0.0165446,0.0368773,-0.0368773
+1.0303,1.01062,1.04998,0.709603,0.0125204,-0.0125204,0.0239103,-0.0239103
+1.44733,1.42077,1.47389,0.720456,0.0143167,-0.0143167,0.0274033,-0.0274033
+1.86147,1.82703,1.89591,0.77786,0.0149273,-0.0149273,0.0270158,-0.0270158
+2.33478,2.29292,2.37664,0.771736,0.0201313,-0.0201313,0.0377038,-0.0377038
+2.88456,2.83354,2.93558,0.783385,0.020775,-0.020775,0.0327067,-0.0327067
+3.75325,3.68409,3.82241,0.748261,0.0303625,-0.0303625,0.0384186,-0.0384186
+4.34776,4.26905,4.42647,0.77678,0.0136475,-0.0136475,0.0339126,-0.0339126
+4.64791,4.56339,4.73243,0.803451,0.0172357,-0.0172357,0.0291487,-0.0291487
+5.16883,5.07341,5.26426,0.843826,0.0298515,-0.0298515,0.0497644,-0.0497644
+

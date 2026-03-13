@@ -1,0 +1,60 @@
+{
+  "timestamp_utc": "2026-02-22T16:22:48.308093+00:00",
+  "energy_tev": "5.02",
+  "centrality": "30-50",
+  "kernel_file": "kernels/kernels_scan06_alice.h5",
+  "use_total_errors": false,
+  "fit_ranges": {
+    "pi_plus": [
+      0.5,
+      1.0
+    ],
+    "k_plus": [
+      0.0,
+      1.5
+    ],
+    "proton": [
+      0.0,
+      2.0
+    ]
+  },
+  "n_thermal_terms": 20,
+  "charge_combined_factor": 2.0,
+  "params": {
+    "Tkin": 0.09949110597180716,
+    "beta_s": 0.8874979906672369,
+    "n": 0.8358744083362496
+  },
+  "norms": {
+    "pi_plus": 63.90356839481405,
+    "k_plus": 58.85521016339968,
+    "proton": 53.00836249876728
+  },
+  "chi2": 1691.434155618131,
+  "ndf": 52,
+  "chi2_ndf": 32.527579915733284,
+  "success": true,
+  "message": "`ftol` termination condition is satisfied.",
+  "covariance": [
+    [
+      1.1603143369383311e-05,
+      -1.669213034309353e-05,
+      -2.2537276327622365e-05
+    ],
+    [
+      -1.6692130343093532e-05,
+      3.247227510751384e-05,
+      6.861755392035504e-05
+    ],
+    [
+      -2.2537276327622382e-05,
+      6.861755392035507e-05,
+      0.00025463461090111973
+    ]
+  ],
+  "param_order": [
+    "Tkin",
+    "beta_s",
+    "n"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "tchem": 0.156,
+  "tkin": 0.12,
+  "beta_s": 0.8,
+  "n_profile": 1.0,
+  "species": ["pi_plus", "k_plus", "proton"],
+  "kernels": "kernels/test_kernel_small.h5",
+  "outdir": "figures",
+  "ratio_pt": 0.5,
+  "mode": "continuous"
+}

@@ -1,0 +1,23 @@
+#: table_doi: 10.17182/hepdata.71310.v1/t15
+#: name: Table 15
+#: description: Kaon-to-pion ratio integrated for pT > 10 GeV/c measured in Pb-Pb collisions.
+
+#: data_file: Table15.yaml
+#: keyword reactions: PB PB --> PI+ X | PB PB --> PI- X | PB PB --> K+ X | PB PB --> K- X
+#: keyword observables: RATIO
+#: keyword phrases: Inclusive | Strange production
+#: keyword cmenergies: 2.76
+#: ETARAP,-0.8-0.8
+#: NPART,N(K+ + K-)/N(PI+ + PI-)
+#: RE(K+ + K-),PB PB --> (K+ + K-) X
+#: RE(PI+ + PI-),PB PB --> (PI+ + PI-) X
+#: SQRT(S)/NUCLEON [TeV],2.76
+NPART,N(K+ + K-)/N(PI+ + PI-),stat +,stat -,sys +,sys -
+2.0,0.5355,0.02104,-0.02104,0.04307,-0.04307
+22.52,0.5048,0.0259,-0.0259,0.06189,-0.06189
+68.56,0.5552,0.01457,-0.01457,0.05986,-0.05986
+157.2,0.5031,0.008949,-0.008949,0.06138,-0.06138
+260.1,0.494,0.01036,-0.01036,0.06277,-0.06277
+329.4,0.4794,0.01356,-0.01356,0.05312,-0.05312
+382.7,0.4749,0.01271,-0.01271,0.05258,-0.05258
+

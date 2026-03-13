@@ -1,0 +1,18 @@
+#: table_doi: 10.17182/hepdata.66630.v1/t20
+#: name: Table 20
+#: description: Yield (dN/dy) of (K*(892)0 + anti-K*(892)0)/2 for different centrality intervals in Pb-Pb collisions at sqrt(sNN)=2.76 TeV.  In the table, the first systematic uncertainty is uncorrelated between centrality intervals, the second is the normalization uncertainty.
+
+#: data_file: Table20.yaml
+#: keyword reactions: PB PB --> K*(892)0 X | PB PB --> AK*(892)0 X
+#: keyword observables: DN/DYRAP | DN/DCENTRALITY | CENTRALITY
+#: keyword phrases: Inclusive | Single Differential Distribution | Rapidity Dependence | Strange production
+#: keyword cmenergies: 2760.0
+#: RE,,,PB PB --> (K*(892)0 < PI- K+ > + AK*(892)0 < PI+ K- >)/2 X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+CENTRALITY [PCT],CENTRALITY [PCT] LOW,CENTRALITY [PCT] HIGH,DN/DYRAP,stat +,stat -,"sys,uncorrelated +","sys,uncorrelated -","sys,normalization +","sys,normalization -","sys,correlated between centrality intervals, excluding normalization +","sys,correlated between centrality intervals, excluding normalization -"
+10.0,0.0,20.0,16.57,0.65,-0.65,1.88,-1.88,0.1,-0.1,10.05%,-10.05%
+30.0,20.0,40.0,8.951,0.782,-0.782,0.637,-0.637,0.134,-0.134,10.05%,-10.05%
+50.0,40.0,60.0,3.935,0.325,-0.325,0.201,-0.201,0.116,-0.116,10.05%,-10.05%
+70.0,60.0,80.0,1.134,0.086,-0.086,0.006,-0.006,0.066,-0.066,10.05%,-10.05%
+

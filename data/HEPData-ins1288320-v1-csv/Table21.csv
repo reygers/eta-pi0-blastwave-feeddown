@@ -1,0 +1,24 @@
+#: table_doi: 10.17182/hepdata.66630.v1/t21
+#: name: Table 21
+#: description: Yield (dN/dy) of phi(1020) mesons for different centrality intervals in Pb-Pb collisions at sqrt(sNN)=2.76 TeV.  In the table, the first systematic uncertainty is uncorrelated between centrality intervals and the second is the normalization uncertainty.
+
+#: data_file: Table21.yaml
+#: keyword reactions: PB PB --> PHI X
+#: keyword observables: DN/DYRAP | DN/DCENTRALITY | CENTRALITY
+#: keyword phrases: Inclusive | Single Differential Distribution | Rapidity Dependence | Strange production
+#: keyword cmenergies: 2760.0
+#: RE,,,PB PB --> PHI < K- K+ > X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+CENTRALITY [PCT],CENTRALITY [PCT] LOW,CENTRALITY [PCT] HIGH,DN/DYRAP,stat +,stat -,"sys,uncorrelated +","sys,uncorrelated -","sys,normalization +","sys,normalization -","sys,correlated between centrality intervals, excluding normalization +","sys,correlated between centrality intervals, excluding normalization -"
+2.5,0.0,5.0,13.75,0.46,-0.46,1.04,-1.04,0.07,-0.07,10.05%,-10.05%
+7.5,5.0,10.0,11.71,0.39,-0.39,0.81,-0.81,0.06,-0.06,10.05%,-10.05%
+15.0,10.0,20.0,9.047,0.217,-0.217,0.515,-0.515,0.063,-0.063,10.05%,-10.05%
+25.0,20.0,30.0,6.964,0.15,-0.15,0.408,-0.408,0.07,-0.07,10.05%,-10.05%
+35.0,30.0,40.0,4.278,0.095,-0.095,0.204,-0.204,0.086,-0.086,10.05%,-10.05%
+45.0,40.0,50.0,2.672,0.049,-0.049,0.126,-0.126,0.064,-0.064,10.05%,-10.05%
+55.0,50.0,60.0,1.486,0.031,-0.031,0.07,-0.07,0.052,-0.052,10.05%,-10.05%
+65.0,60.0,70.0,0.7152,0.0198,-0.0198,0.0309,-0.0309,0.0358,-0.0358,10.05%,-10.05%
+75.0,70.0,80.0,0.3016,0.0103,-0.0103,0.0218,-0.0218,0.0202,-0.0202,10.05%,-10.05%
+85.0,80.0,90.0,0.0973,0.00387,-0.00387,0.00724,-0.00724,0.01168,-0.00827,10.05%,-10.05%
+

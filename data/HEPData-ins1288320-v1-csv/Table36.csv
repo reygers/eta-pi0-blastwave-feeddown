@@ -1,0 +1,25 @@
+#: table_doi: 10.17182/hepdata.66630.v1/t36
+#: name: Table 36
+#: description: Ratio of pT-integrated yields phi(1020)/(pi+ + pi-) for different centrality intervals in Pb-Pb collisions at sqrt(sNN)=2.76 TeV.  The charged pion yields are taken from PRC 88, 044910 (2013).  In the paper this ratio is plotted as a function of the <Npart> values taken from PRC 88, 044909 (2013).
+
+#: data_file: Table36.yaml
+#: keyword reactions: PB PB --> PHI X | PB PB --> PI+ X | PB PB --> PI- X
+#: keyword observables: SIG/SIG
+#: keyword phrases: Inclusive | Integrated Cross Section | Cross Section
+#: keyword cmenergies: 2760.0
+#: RE(PHI),,,PB PB --> PHI < K- K+ > X
+#: RE(PI+ + PI-),,,PB PB --> (PI+ + PI-) X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+CENTRALITY [PCT],CENTRALITY [PCT] LOW,CENTRALITY [PCT] HIGH,SIG(PHI)/SIG(PI+ + PI-),stat +,stat -,"sys,uncorrelated +","sys,uncorrelated -","sys,correlated between centrality intervals +","sys,correlated between centrality intervals -"
+2.5,0.0,5.0,0.009383,0.000316,-0.000316,0.000864,-0.000864,5.11%,-5.11%
+7.5,5.0,10.0,0.009676,0.000326,-0.000326,0.000816,-0.000816,5.11%,-5.11%
+15.0,10.0,20.0,0.009957,0.000239,-0.000239,0.000729,-0.000729,5.11%,-5.11%
+25.0,20.0,30.0,0.01136,0.00024,-0.00024,0.00083,-0.00083,5.11%,-5.11%
+35.0,30.0,40.0,0.01069,0.00024,-0.00024,0.00068,-0.00068,5.11%,-5.11%
+45.0,40.0,50.0,0.0108,0.0002,-0.0002,0.00067,-0.00067,5.11%,-5.11%
+55.0,50.0,60.0,0.01046,0.00022,-0.00022,0.00064,-0.00064,5.11%,-5.11%
+65.0,60.0,70.0,0.009676,0.000267,-0.000267,0.000551,-0.000551,5.11%,-5.11%
+75.0,70.0,80.0,0.008851,0.000301,-0.000301,0.000717,-0.000717,5.11%,-5.11%
+85.0,80.0,90.0,0.007349,0.000293,-0.000293,0.000612,-0.000612,5.11%,-5.11%
+

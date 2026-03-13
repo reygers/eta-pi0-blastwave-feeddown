@@ -1,0 +1,23 @@
+#: table_doi: 10.17182/hepdata.66630.v1/t4
+#: name: Table 4
+#: description: Transverse-momentum distributions of (K*(892)0 + anti-K*(892)0)/2 in Pb-Pb collisions at sqrt(sNN)=2.76 TeV, centrality 60.0-80.0%.
+
+#: data_file: Table4.yaml
+#: keyword reactions: PB PB --> K*(892)0 X | PB PB --> AK*(892)0 X
+#: keyword observables: DN/DPT
+#: keyword phrases: Inclusive | Single Differential Distribution | Transverse Momentum Dependence | Strange production
+#: keyword cmenergies: 2760.0
+#: CENTRALITY [pct],,,60.0-80.0
+#: RE,,,PB PB --> (K*(892)0 < PI- K+ > + AK*(892)0 < PI+ K- >)/2 X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+PT [GEV],PT [GEV] LOW,PT [GEV] HIGH,(1/Nev)*D2(N)/DPT/DYRAP [GEV**-1],stat +,stat -,"sys,uncorrelated +","sys,uncorrelated -","sys,normalization +","sys,normalization -","sys,other pT-correlated systematic uncertainties +","sys,other pT-correlated systematic uncertainties -"
+0.55,0.3,0.8,0.8002,0.0441,-0.0441,0.0904,-0.0904,5.85%,-5.85%,10.05%,-10.05%
+1.0,0.8,1.2,0.6801,0.0381,-0.0381,0.0942,-0.0942,5.85%,-5.85%,10.05%,-10.05%
+1.4,1.2,1.6,0.3915,0.0213,-0.0213,0.0556,-0.0556,5.85%,-5.85%,10.05%,-10.05%
+1.8,1.6,2.0,0.1958,0.0123,-0.0123,0.0273,-0.0273,5.85%,-5.85%,10.05%,-10.05%
+2.25,2.0,2.5,0.1357,0.0065,-0.0065,0.022,-0.022,5.85%,-5.85%,10.05%,-10.05%
+2.75,2.5,3.0,0.05901,0.0033,-0.0033,0.00798,-0.00798,5.85%,-5.85%,10.05%,-10.05%
+3.5,3.0,4.0,0.02141,0.00112,-0.00112,0.0029,-0.0029,5.85%,-5.85%,10.05%,-10.05%
+4.5,4.0,5.0,0.006516,0.000484,-0.000484,0.00092,-0.00092,5.85%,-5.85%,10.05%,-10.05%
+

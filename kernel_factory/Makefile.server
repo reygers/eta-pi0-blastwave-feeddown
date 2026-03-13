@@ -1,0 +1,26 @@
+# Usage:
+#   make -f Makefile.server
+#
+# Required env vars:
+#   ROOTSYS (from thisroot.sh)
+#   PYTHIA8 (root of Pythia8 install, e.g. /misc/alidata131/alice_u/reygers/pythia8317)
+#   HDF5 (root of HDF5 install)
+
+PYTHIA8 ?= /misc/alidata131/alice_u/reygers/pythia8317
+HDF5 ?= /misc/alidata131/alice_u/reygers/hdf5
+
+CXX := g++
+CXXFLAGS := -O2 -std=c++17 $(shell root-config --cflags)
+LDFLAGS := $(shell root-config --glibs) \
+	-L$(PYTHIA8)/lib -lpythia8 \
+	-L$(ROOTSYS)/lib -lEG -lEGPythia8 \
+	-L$(HDF5)/lib -lhdf5 -lhdf5_cpp
+CPPFLAGS := -I$(PYTHIA8)/include -I$(HDF5)/include
+
+all: kernel_factory
+
+kernel_factory: kernel_factory.cc
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $< $(LDFLAGS)
+
+clean:
+	rm -f kernel_factory

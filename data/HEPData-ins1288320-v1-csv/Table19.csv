@@ -1,0 +1,37 @@
+#: table_doi: 10.17182/hepdata.66630.v1/t19
+#: name: Table 19
+#: description: Width of phi(1020) mesons as a function of pT for central (0-10%, first y column) and peripheral (70-80%, second y column) Pb-Pb collisions at sqrt(sNN)=2.76 TeV.
+
+#: data_file: Table19.yaml
+#: keyword reactions: PB PB --> PHI X
+#: keyword observables: WIDTH
+#: keyword phrases: Inclusive | Strange production
+#: keyword cmenergies: 2760.0
+#: CENTRALITY [pct],,,0.0-10.0,,,,
+#: RE,,,PB PB --> PHI < K- K+ > X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+PT [GEV],PT [GEV] LOW,PT [GEV] HIGH,WIDTH [MEV],stat +,stat -,sys +,sys -
+0.65,0.5,0.8,4.653,0.398,-0.398,0.645,-0.645
+0.9,0.8,1.0,4.228,0.257,-0.257,0.492,-0.492
+1.25,1.0,1.5,3.996,0.208,-0.208,0.773,-0.773
+1.75,1.5,2.0,4.439,0.388,-0.388,0.655,-0.655
+2.25,2.0,2.5,4.973,0.536,-0.536,0.824,-0.824
+2.75,2.5,3.0,5.206,0.559,-0.559,0.524,-0.524
+3.5,3.0,4.0,4.476,0.522,-0.522,0.929,-0.929
+4.5,4.0,5.0,5.199,1.105,-1.105,2.167,-2.167
+
+#: CENTRALITY [pct],,,0.0-10.0,,,,
+#: RE,,,PB PB --> PHI < K- K+ > X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+PT [GEV],PT [GEV] LOW,PT [GEV] HIGH,WIDTH [MEV],stat +,stat -,sys +,sys -
+0.65,0.5,0.8,5.046,0.461,-0.461,0.42,-0.42
+0.9,0.8,1.0,4.491,0.295,-0.295,0.347,-0.347
+1.25,1.0,1.5,4.215,0.238,-0.238,0.464,-0.464
+1.75,1.5,2.0,3.968,0.471,-0.471,1.357,-1.357
+2.25,2.0,2.5,5.992,0.917,-0.917,2.506,-2.506
+2.75,2.5,3.0,4.323,0.647,-0.647,1.228,-1.228
+3.5,3.0,4.0,5.295,0.625,-0.625,0.632,-0.632
+4.5,4.0,5.0,5.375,1.013,-1.013,2.319,-2.319
+

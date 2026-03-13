@@ -1,0 +1,23 @@
+#: table_doi: 10.17182/hepdata.71310.v1/t16
+#: name: Table 16
+#: description: Proton-to-pion ratio integrated for pT > 10 GeV/c measured in Pb-Pb collisions.
+
+#: data_file: Table16.yaml
+#: keyword reactions: PB PB --> PI+ X | PB PB --> PI- X | PB PB --> P X | PB PB --> PBAR X
+#: keyword observables: RATIO
+#: keyword phrases: Inclusive
+#: keyword cmenergies: 2.76
+#: ETARAP,-0.8-0.8
+#: NPART,N(P + PBAR)/N(PI+ + PI-)
+#: RE(P + PBAR),PB PB --> (P + PBAR) X
+#: RE(PI+ + PI-),PB PB --> (PI+ + PI-) X
+#: SQRT(S)/NUCLEON [TeV],2.76
+NPART,N(P + PBAR)/N(PI+ + PI-),stat +,stat -,sys +,sys -
+2.0,0.08078,0.009344,-0.009344,0.01258,-0.01258
+22.52,0.091,0.01036,-0.01036,0.0197,-0.0197
+68.56,0.09236,0.005947,-0.005947,0.01978,-0.01978
+157.2,0.08897,0.003911,-0.003911,0.02033,-0.02033
+260.1,0.08697,0.00459,-0.00459,0.01997,-0.01997
+329.4,0.08204,0.00678,-0.00678,0.01639,-0.01639
+382.7,0.08146,0.006265,-0.006265,0.01661,-0.01661
+

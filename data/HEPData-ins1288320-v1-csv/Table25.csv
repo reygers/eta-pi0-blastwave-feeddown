@@ -1,0 +1,24 @@
+#: table_doi: 10.17182/hepdata.66630.v1/t25
+#: name: Table 25
+#: description: Mean transverse momentum of phi(1020) mesons for different centrality intervals in Pb-Pb collisions at sqrt(sNN)=2.76 TeV.  In the paper this ratio is plotted as a function of the <Npart> values (the mean number of participant nucleons per collision) taken from PRC 88, 044909 (2013).
+
+#: data_file: Table25.yaml
+#: keyword reactions: PB PB --> PHI X
+#: keyword observables: PT
+#: keyword phrases: Inclusive | Strange production
+#: keyword cmenergies: 2760.0
+#: RE,,,PB PB --> PHI < K- K+ > X
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,-0.5-0.5
+CENTRALITY [PCT],CENTRALITY [PCT] LOW,CENTRALITY [PCT] HIGH,MEAN(PT) [GEV],stat +,stat -,sys +,sys -
+2.5,0.0,5.0,1.307,0.044,-0.044,0.058,-0.058
+7.5,5.0,10.0,1.337,0.04,-0.04,0.056,-0.056
+15.0,10.0,20.0,1.345,0.029,-0.029,0.036,-0.036
+25.0,20.0,30.0,1.287,0.025,-0.025,0.027,-0.027
+35.0,30.0,40.0,1.251,0.025,-0.025,0.032,-0.032
+45.0,40.0,50.0,1.219,0.023,-0.023,0.047,-0.047
+55.0,50.0,60.0,1.202,0.024,-0.024,0.039,-0.039
+65.0,60.0,70.0,1.174,0.033,-0.033,0.045,-0.045
+75.0,70.0,80.0,1.122,0.034,-0.034,0.034,-0.034
+85.0,80.0,90.0,1.139,0.047,-0.047,0.057,-0.057
+

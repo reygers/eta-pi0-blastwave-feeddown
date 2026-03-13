@@ -1,0 +1,26 @@
+#: table_doi: 10.17182/hepdata.83964.v1/t4
+#: name: Table 4
+#: description: Invariant yields of the $\eta$ meson in the centrality class 20-50% in Pb-Pb collisions at sqrt{s_NN} = 2.76 TeV at mid-rapidity.
+
+#: data_file: Table4.yaml
+#: keyword reactions: PB PB --> ETA X
+#: keyword observables: DN/DPT**2/DYRAP
+#: keyword phrases: Differential Invariant Yields | Transverse Momentum Dependence | Lead-Lead Scattering | Eta Meson Production
+#: keyword cmenergies: 2760.0
+#: RE,,,PB PB --> ETA X
+#: CENTRALITY [PCT],,,20.0 TO 50.0
+#: SQRT(S)/NUCLEON [GeV],,,2760.0
+#: YRAP,,,0.0
+PT [GEV/c],PT [GEV/c] LOW,PT [GEV/c] HIGH,1/(2 pi N_evt) (d^2 N)/(p_T dp_T*dy) [(GeV/c)^-2],stat +,stat -,sys +,sys -
+1.2343,1.0,1.5,0.9811043,0.3351843,-0.3351843,0.3522351,-0.3522351
+1.7314,1.5,2.0,0.2815473,0.06510249,-0.06510249,0.06526126,-0.06526126
+2.4275,2.0,3.0,0.0604672,0.009901447,-0.009901447,0.01145473,-0.01145473
+3.4309,3.0,4.0,0.008558223,0.001280993,-0.001280993,0.001632507,-0.001632507
+4.7768,4.0,6.0,0.0007995575,7.743754e-05,-7.743754e-05,0.0001224707,-0.0001224707
+6.8517,6.0,8.0,9.100764e-05,7.141181e-06,-7.141181e-06,1.399579e-05,-1.399579e-05
+8.8902,8.0,10.0,2.076192e-05,1.063218e-06,-1.063218e-06,3.137944e-06,-3.137944e-06
+10.9102,10.0,12.0,5.453338e-06,4.283208e-07,-4.283208e-07,8.344449e-07,-8.344449e-07
+12.9238,12.0,14.0,2.148116e-06,2.360974e-07,-2.360974e-07,3.063971e-07,-3.063971e-07
+15.3559,14.0,17.0,8.417288e-07,1.057897e-07,-1.057897e-07,1.227529e-07,-1.227529e-07
+18.379,17.0,20.0,2.421766e-07,5.083482e-08,-5.083482e-08,3.572604e-08,-3.572604e-08
+
