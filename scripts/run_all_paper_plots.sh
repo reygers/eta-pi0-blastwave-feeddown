@@ -29,9 +29,6 @@ echo "[2/10] double-ratio plot"
   --n-quantum-terms "$NQUANT" \
   --pt-min 0.05 --pt-max 3.0 --pt-step 0.05 \
   --show-components \
-  --show-sensitivity-band \
-  --sensitivity-frac 0.20 \
-  --sensitivity-band-mode eigen-envelope \
   --outdir paper/figures
 
 echo "[3/10] flow-scaling collapse figure"

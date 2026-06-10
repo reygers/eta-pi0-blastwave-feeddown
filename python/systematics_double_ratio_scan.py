@@ -336,21 +336,24 @@ def main():
     if write_aux:
         print(f"Wrote {out1}")
 
-    # 2) No-feeddown vs core
+    # 2) No-feeddown hybrid comparator vs core
     fr_nofd = fr_base
-    nofd_label = "without feeddown"
+    nofd_label = "no-feeddown hybrid"
     if args.no_feeddown_fit_results:
         fr_nofd = load_fit(args.no_feeddown_fit_results)
         fr_nofd["tchem"] = float(args.tchem)
-        nofd_label = "without feeddown (refit)"
+        nofd_label = "no-feeddown hybrid (refit)"
     elif args.run_no_feeddown_refit:
         nofd_json = other_outdir / f"blastwave_fit_{etag}_{ctag}_nofd.json"
         run_no_feeddown_refit(args, fr_base, nofd_json)
         fr_nofd = load_fit(str(nofd_json))
         fr_nofd["tchem"] = float(args.tchem)
-        nofd_label = "without feeddown (refit)"
+        nofd_label = "no-feeddown hybrid (refit)"
 
-    dr_nofd, _, _ = compute_dr(
+    # Build a fair no-feeddown comparator:
+    # use (eta/K)_noFD from primary-only model and combine with (pi+/pi0)_core.
+    # This isolates no-feeddown effects in eta/K without the known pi+/pi0 artifact.
+    _, eta_over_k_nofd, _ = compute_dr(
         pt,
         fr_nofd,
         args.kernels,
@@ -359,6 +362,7 @@ def main():
         n_thermal_terms=args.n_thermal_terms,
         n_quantum_terms=args.n_quantum_terms,
     )
+    dr_nofd = eta_over_k_nofd * pi_over_pi0_core
     out2 = other_outdir / f"systematics_no_feeddown_{etag}_{ctag}.pdf"
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(7, 5), sharex=True, gridspec_kw={"height_ratios": [3, 1]})
     ax1.plot(pt, dr_core, "-", lw=2.2, color="C0", label="with feeddown (core)")
@@ -369,7 +373,7 @@ def main():
     r2 = np.divide(dr_nofd, dr_core, out=np.full_like(dr_core, np.nan), where=np.isfinite(dr_core) & (dr_core != 0))
     ax2.axhline(1.0, color="black", lw=1)
     ax2.plot(pt, r2, "-", color="C3", lw=1.8)
-    ax2.set_ylabel("noFD/core")
+    ax2.set_ylabel("hybrid/core")
     ax2.set_xlabel(r"$p_T$ (GeV/$c$)")
     ax2.grid(alpha=0.3)
     fig.tight_layout()

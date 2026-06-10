@@ -465,7 +465,15 @@ def main():
         if np.any(m):
             lo = np.minimum(eta_lo[m], eta_hi[m])
             hi = np.maximum(eta_lo[m], eta_hi[m])
-            ax.fill_between(pt_d[m], lo, hi, color="0.7", alpha=0.25, linewidth=0, label=r"$\eta$ uncertainty band")
+            ax.fill_between(
+                pt_d[m],
+                lo,
+                hi,
+                color="C1",
+                alpha=0.40,
+                linewidth=0,
+                label=r"$\eta$ uncertainty band",
+            )
         # Half-width of eta fraction band = relative impact scale to compare to 5%.
         eta_impact = 0.5 * np.abs(eta_hi - eta_lo)
 
@@ -547,6 +555,28 @@ def main():
                 print(f"(direct/decay)/(eta-uncert/decay) at pT={p_ref:.1f} GeV/c = {val:.6g}")
         else:
             print("Warning: cannot compute (direct/decay)/(eta-uncert/decay): no finite overlapping points.")
+
+    # Report omega fraction at reference pT values for quick manuscript checks.
+    omega_pid = 223
+    if omega_pid in frac:
+        y_omega = np.asarray(frac[omega_pid], dtype=float)
+        m_omega = np.isfinite(pt_d) & np.isfinite(y_omega)
+        if np.any(m_omega):
+            x = pt_d[m_omega]
+            y = y_omega[m_omega]
+            x_min = float(np.min(x))
+            x_max = float(np.max(x))
+            for p_ref in (1.0, 3.0, 5.0):
+                if p_ref < x_min or p_ref > x_max:
+                    print(
+                        f"omega fraction at pT={p_ref:.1f} GeV/c: "
+                        f"out of interpolation range [{x_min:.3f}, {x_max:.3f}]"
+                    )
+                    continue
+                val = float(np.interp(p_ref, x, y, left=np.nan, right=np.nan))
+                print(f"omega fraction at pT={p_ref:.1f} GeV/c = {val:.6g}")
+        else:
+            print("Warning: cannot compute omega fraction: no finite points.")
     if direct_over_decay is not None:
         m_dr = m_plot & np.isfinite(direct_over_decay)
         if np.any(m_dr):

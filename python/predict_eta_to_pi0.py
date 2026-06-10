@@ -534,12 +534,12 @@ def main():
     ap.add_argument("--pseudo-pt-step", type=float, default=0.1)
     ap.add_argument("--pseudo-csv-out", default=None)
     ap.add_argument("--no-pseudo", action="store_true")
-    ap.add_argument("--eta-pi0-pp-ref", type=float, default=0.487, help="Reference universal eta/pi0 in pp for Ren-Drees-style correction.")
+    ap.add_argument("--eta-pi0-pp-ref", type=float, default=0.487, help="Reference universal eta/pi0 in pp for Ren–Drees-style correction.")
     ap.add_argument(
         "--eta-pi0-pp-mode",
         choices=["constant", "fitfun"],
         default="fitfun",
-        help="pp reference for Ren-Drees correction: constant or fitfun parameterization.",
+        help="pp reference for Ren–Drees correction: constant or fitfun parameterization.",
     )
     ap.add_argument(
         "--eta-norm-mode",
@@ -909,7 +909,7 @@ def main():
                     }
                 )
 
-            # Ren-Drees-style flow correction:
+            # Ren–Drees-style flow correction:
             # (eta/pi0)_AA = (eta/pi0)_pp * (K/pi)_AA / (K/pi)_pp
             k_over_pi_pp = np.interp(pt_ps, pp_k["pt"], pp_k["y"], left=np.nan, right=np.nan) / np.interp(
                 pt_ps, pp_pi["pt"], pp_pi["y"], left=np.nan, right=np.nan
@@ -923,7 +923,7 @@ def main():
                 k_over_pi_meas, k_over_pi_pp, out=np.full_like(k_over_pi_meas, np.nan), where=np.isfinite(k_over_pi_pp) & (k_over_pi_pp > 0)
             )
 
-            # Show Ren-Drees points on the charged-hadron binning used to build K/pi.
+            # Show Ren–Drees points on the charged-hadron binning used to build K/pi.
             # Use K+ bin centers and require support from pi+, K+ (AA and pp).
             pt_dr_min = max(float(np.min(ch_k["pt"])), float(np.min(ch_pi["pt"])), float(np.min(pp_k["pt"])), float(np.min(pp_pi["pt"])))
             pt_dr_max = min(float(np.max(ch_k["pt"])), float(np.max(ch_pi["pt"])), float(np.max(pp_k["pt"])), float(np.max(pp_pi["pt"])), 8.0)
@@ -1004,7 +1004,7 @@ def main():
                 capsize=2,
                 color="0.75",
                 ecolor="0.75",
-                label=r"Ren-Drees $((K/\pi)_{AA}/(K/\pi)_{pp})\cdot(\eta/\pi^{0})_{pp}$",
+                label=r"Ren–Drees $((K/\pi)_{AA}/(K/\pi)_{pp})\cdot(\eta/\pi^{0})_{pp}$",
             )
 
             for i in range(len(pt_ps)):
@@ -1032,7 +1032,7 @@ def main():
         popt_m, pcov_m, chi2_m, ndf_m = do_weighted_fit(pt[m], ratio[m], yerr[m], "measured-only")
         measured_fit = (popt_m, pcov_m, chi2_m, ndf_m)
         pt_dense = np.linspace(0.0, 8.0, 800)
-        plt.plot(pt_dense, fit_model.fn(pt_dense, *popt_m), "--", color="0.45", lw=1.8, label="fit: measured only")
+        plt.plot(pt_dense, fit_model.fn(pt_dense, *popt_m), ":", color="0.45", lw=1.8, label="fit: measured only")
         print(f"Measured-only fit ({fit_model.name}): chi2/ndf = {chi2_m:.3f}/{ndf_m} = {(chi2_m/ndf_m if ndf_m>0 else np.nan):.3f}")
 
         # Fit 1: measured + pseudo A (if pseudo available)

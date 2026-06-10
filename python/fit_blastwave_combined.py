@@ -150,17 +150,7 @@ def plot_fit_with_range(x, y, color, fit_min, fit_max, label):
     y = y[finite]
     if x.size == 0:
         return
-
-    inside = (x >= fit_min) & (x <= fit_max)
-    outside_left = x < fit_min
-    outside_right = x > fit_max
-
-    if np.any(outside_left):
-        plt.plot(x[outside_left], y[outside_left], "--", color=color, lw=1.8)
-    if np.any(inside):
-        plt.plot(x[inside], y[inside], "-", color=color, lw=2.0, label=label)
-    if np.any(outside_right):
-        plt.plot(x[outside_right], y[outside_right], "--", color=color, lw=1.8)
+    plt.plot(x, y, "-", color=color, lw=2.0, label=label)
 
 
 def main():
