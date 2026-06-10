@@ -1,13 +1,11 @@
 # Blast-Wave Feeddown Toolkit
 
-This repository contains the code used to build and apply hadronic feeddown kernels for blast-wave studies of identified-particle spectra in heavy-ion collisions. The public-facing workflow is centered on:
+This repository contains the code used to build and apply hadronic feeddown kernels for blast-wave studies of identified-particle spectra in heavy-ion collisions. The workflow is centered on:
 
 - generating feeddown kernels with `kernel_factory/`
 - fitting identified hadron spectra with the Python tools in `python/`
 - constructing a low-`p_T` `eta/pi0` parameterization and propagating it to a decay-photon cocktail
 - reproducing the main figures used in the paper
-
-The repository also contains an `internal/` directory with legacy code, cluster-specific helpers, cross-checks, and exploratory scripts that are not part of the public analysis path.
 
 ## Repository Layout
 
@@ -23,8 +21,6 @@ The repository also contains an `internal/` directory with legacy code, cluster-
   - kernel log and local kernel files
 - `paper/`
   - manuscript source and paper-figure outputs
-- `internal/`
-  - non-public or development-oriented material
 
 ## Requirements
 
@@ -65,7 +61,7 @@ python3 -m venv .venv
 pip install -r requirements.txt
 ```
 
-The public Python scripts are intended to run directly from the repository root, for example:
+The Python scripts are intended to run directly from the repository root, for example:
 
 ```bash
 python python/fit_blastwave_combined.py --help
@@ -169,7 +165,7 @@ python python/plot_decay_photons.py \
 
 ## Large Files and Generated Outputs
 
-Large generated files are not ideal for a public GitHub repository. In particular:
+Large generated files are not ideal for a GitHub repository. In particular:
 
 - kernel HDF5 files in `kernels/`
 - generated outputs in `outputs/` and generated figures in `paper/figures/`
@@ -177,15 +173,13 @@ Large generated files are not ideal for a public GitHub repository. In particula
 
 should typically be ignored or distributed separately.
 
-`outputs/` is the shared generated-work directory for intermediate CSV, JSON, and non-curated plot products passed between scripts in the public workflow.
+`outputs/` is the shared generated-work directory for intermediate CSV, JSON, and non-curated plot products passed between scripts in the workflow.
 
 ## Release Notes
 
-- The cleaned public workflow lives at the repository top level.
-- `internal/` is retained for development history and validation context, but is not required for the public analysis path.
+- The cleaned workflow lives at the repository top level.
 - The repository is released under the MIT License; see `LICENSE`.
 
 ## Notes
 
 - `kernels/KERNEL_LOG.md` documents the main kernel production scans.
-- `internal/` contains development history and validation material that can be useful for the authors, but is not required for standard use of the public analysis workflow.
