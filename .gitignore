@@ -25,7 +25,7 @@ kernels/*.h5
 outputs/
 paper/figures/
 !paper/figures/.gitkeep
-internal/figures/
+internal/
 
 # Paper build products
 paper/*.aux
