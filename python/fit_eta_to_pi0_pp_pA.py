@@ -164,7 +164,8 @@ def main():
     plt.ylabel(r"$\eta/\pi^0$")
     plt.grid(alpha=0.3)
     plt.legend(frameon=False, loc="lower right")
-    plt.tight_layout()
+    # Match the plotting-box height and margins used by the adjacent appendix figure.
+    plt.subplots_adjust(left=0.16, right=0.96, bottom=0.185, top=0.94)
     plt.savefig(out_pdf, dpi=160)
     plt.close()
 

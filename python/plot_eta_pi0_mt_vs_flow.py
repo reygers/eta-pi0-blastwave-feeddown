@@ -190,7 +190,8 @@ def main():
     plt.text(0.03, 0.97, ttl, transform=plt.gca().transAxes, va="top", ha="left", fontsize=14)
     plt.grid(alpha=0.3)
     plt.legend(frameon=False, loc="lower right")
-    plt.tight_layout()
+    # Keep the plotting box aligned with the adjacent appendix figure.
+    plt.subplots_adjust(left=0.16, right=0.96, bottom=0.185, top=0.94)
     plt.savefig(out, dpi=160)
     plt.close()
     print(f"Wrote {out}")
