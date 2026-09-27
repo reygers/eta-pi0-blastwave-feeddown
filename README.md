@@ -103,7 +103,13 @@ Core analysis scripts in `python/`:
 - `plot_eta_pi0_mt_vs_flow.py`
   - appendix-style comparison of `m_T` scaling, pp reference, and the fitted `eta/pi0` parameterization
 - `systematics_double_ratio_scan.py`
-  - systematic-variation study for the blast-wave double ratio
+  - internal systematic-variation study for the blast-wave double ratio
+  - use `--run-internal-refits` once to create the cached fit-window,
+    chemical-temperature, and error-weighting variants, plus a fixed-profile
+    stress test
+  - optional `--run-resonance-content-refits` creates incomplete-resonance
+    diagnostics; these, FluiduM, flow scaling, and no-feeddown are excluded
+    from the assigned internal envelope
 
 ## Reproducing the Main Paper Plots
 
@@ -132,7 +138,8 @@ Run the simultaneous blast-wave fit:
 python python/fit_blastwave_combined.py \
   --energy 2.76 \
   --centrality 0-10 \
-  --kernels kernels/kernels_scan09_alice.h5
+  --kernels kernels/kernels_scan09_alice.h5 \
+  --particle-overlay "data/Thermal-FIST 1.6/missing_particles_all_lt2gev_tau1mm.cmnd"
 ```
 
 Construct the final `eta/pi0` parameterization and uncertainty band:
@@ -142,11 +149,12 @@ python python/predict_eta_to_pi0.py \
   --energy 2.76 \
   --centrality 0-10 \
   --kernels kernels/kernels_scan09_alice.h5 \
+  --particle-overlay "data/Thermal-FIST 1.6/missing_particles_all_lt2gev_tau1mm.cmnd" \
   --fit-results data/fit_results/blastwave_fit_2p76TeV_0_10.json \
   --n-thermal-terms 10 \
   --n-quantum-terms 10 \
   --show-estimated-band \
-  --systematics-curves-csv outputs/current/systematics_double_ratio_curves_2p76TeV_0_10.csv \
+  --systematics-summary-json outputs/current/systematics_internal_summary_2p76TeV_0_10.json \
   --main-plot-only \
   --outdir paper/figures
 ```

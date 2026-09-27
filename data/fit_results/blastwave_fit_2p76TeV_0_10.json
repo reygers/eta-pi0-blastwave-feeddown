@@ -1,8 +1,15 @@
 {
-  "timestamp_utc": "2026-05-19T19:24:54.327004+00:00",
+  "timestamp_utc": "2026-08-14T15:36:21.305336+00:00",
   "energy_tev": "2.76",
   "centrality": "0-10",
   "kernel_file": "kernels/kernels_scan09_alice.h5",
+  "decaytable": "data/decaytables/decaytable_pythia8.dat",
+  "particle_overlays": [
+    "data/Thermal-FIST 1.6/missing_particles_all_lt2gev_tau1mm.cmnd"
+  ],
+  "variation_label": "baseline",
+  "tchem": 0.156,
+  "fixed_n": null,
   "use_total_errors": false,
   "fit_ranges": {
     "pi_plus": [
@@ -23,35 +30,35 @@
   "charge_combined_factor": 2.0,
   "include_feeddown": true,
   "params": {
-    "Tkin": 0.08171077819805982,
-    "beta_s": 0.8956607929696445,
-    "n": 0.703075418573115
+    "Tkin": 0.07977364959907228,
+    "beta_s": 0.8966480002880579,
+    "n": 0.7019400040580009
   },
   "norms": {
-    "pi_plus": 212.35272937971882,
-    "k_plus": 186.62379272930434,
-    "proton": 144.2117466687335
+    "pi_plus": 203.219102019619,
+    "k_plus": 182.95407219187382,
+    "proton": 132.51534566284244
   },
-  "chi2": 678.6073181100738,
+  "chi2": 672.1517310954625,
   "ndf": 52,
-  "chi2_ndf": 13.050140732886035,
+  "chi2_ndf": 12.925994828758895,
   "success": true,
   "message": "`ftol` termination condition is satisfied.",
   "covariance": [
     [
-      5.447035606619393e-06,
-      -6.704455698804895e-06,
-      -1.0079444641562354e-05
+      5.67157865988866e-06,
+      -6.826581992048865e-06,
+      -1.019602633987897e-05
     ],
     [
-      -6.704455698804895e-06,
-      1.1695402584668219e-05,
-      2.6696664137191222e-05
+      -6.826581992048865e-06,
+      1.1582272185778031e-05,
+      2.6211978734835e-05
     ],
     [
-      -1.007944464156235e-05,
-      2.6696664137191222e-05,
-      0.00010271429860826894
+      -1.0196026339878968e-05,
+      2.6211978734835e-05,
+      0.00010048304340037765
     ]
   ],
   "param_order": [

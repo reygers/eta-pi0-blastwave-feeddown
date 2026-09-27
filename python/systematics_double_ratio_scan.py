@@ -83,6 +83,8 @@ def compute_dr(pt, fr, kernels, ratio_source, eta_norm_mode, n_thermal_terms=Non
     n_q_terms = int(fr.get("n_quantum_terms", 1)) if n_quantum_terms is None else int(n_quantum_terms)
     eta_scale = eta_scale_from_fit(fr, eta_norm_mode)
     tchem = float(fr.get("tchem", 0.156))
+    decaytable = str(fr.get("decaytable", "data/decaytables/decaytable_pythia8.dat"))
+    particle_overlays = fr.get("particle_overlays", [])
     if ratio_source == "kernel-total":
         dr, eta_over_k, pi_over_pi0 = build_model_ratios_kernel_total(
             pt,
@@ -93,6 +95,8 @@ def compute_dr(pt, fr, kernels, ratio_source, eta_norm_mode, n_thermal_terms=Non
             tchem=tchem,
             n_thermal_terms=n_terms,
             n_quantum_terms=n_q_terms,
+            decaytable=decaytable,
+            particle_overlays=particle_overlays,
             eta_scale=eta_scale,
         )
     else:
@@ -135,6 +139,7 @@ def make_flow_double_ratio(
 def run_fit_window(args, label, win, out_json):
     cmd = [
         sys.executable,
+        "-u",
         "python/fit_blastwave_combined.py",
         "--energy",
         args.energy,
@@ -142,6 +147,8 @@ def run_fit_window(args, label, win, out_json):
         args.centrality,
         "--kernels",
         args.kernels,
+        "--tchem",
+        str(args.tchem),
         "--n-thermal-terms",
         str(args.n_thermal_terms),
         "--n-quantum-terms",
@@ -161,9 +168,65 @@ def run_fit_window(args, label, win, out_json):
         "--results-out",
         str(out_json),
         "--outdir",
-        args.outdir,
+        str(args.other_outdir or args.outdir),
+        "--variation-label",
+        label,
     ]
+    for overlay in args.particle_overlay:
+        cmd.extend(["--particle-overlay", overlay])
     print(f"[fit-window] running {label}: {' '.join(cmd)}")
+    subprocess.run(cmd, check=True)
+
+
+def run_internal_refit(
+    args,
+    fr_base,
+    label,
+    out_json,
+    *,
+    tchem=None,
+    fixed_n=None,
+    use_total_errors=None,
+    kernels=None,
+    particle_overlays=None,
+):
+    fit_ranges = fr_base.get("fit_ranges", {})
+    pi_rng = fit_ranges.get("pi_plus", [0.5, 1.0])
+    k_rng = fit_ranges.get("k_plus", [0.0, 1.5])
+    p_rng = fit_ranges.get("proton", [0.0, 2.0])
+    kernel_path = str(kernels or fr_base.get("kernel_file", args.kernels))
+    overlays = list(particle_overlays if particle_overlays is not None else fr_base.get("particle_overlays", args.particle_overlay))
+    tc = float(fr_base.get("tchem", args.tchem) if tchem is None else tchem)
+    if use_total_errors is None:
+        use_total_errors = bool(fr_base.get("use_total_errors", False))
+
+    cmd = [
+        sys.executable,
+        "-u",
+        "python/fit_blastwave_combined.py",
+        "--energy", args.energy,
+        "--centrality", args.centrality,
+        "--kernels", kernel_path,
+        "--tchem", str(tc),
+        "--n-thermal-terms", str(args.n_thermal_terms),
+        "--n-quantum-terms", str(args.n_quantum_terms),
+        "--pt-pion-min", str(float(pi_rng[0])),
+        "--pt-pion-max", str(float(pi_rng[1])),
+        "--pt-kaon-min", str(float(k_rng[0])),
+        "--pt-kaon-max", str(float(k_rng[1])),
+        "--pt-proton-min", str(float(p_rng[0])),
+        "--pt-proton-max", str(float(p_rng[1])),
+        "--variation-label", label,
+        "--results-out", str(out_json),
+        "--outdir", str(args.other_outdir or args.outdir),
+    ]
+    for overlay in overlays:
+        cmd.extend(["--particle-overlay", str(overlay)])
+    if fixed_n is not None:
+        cmd.extend(["--fixed-n", str(float(fixed_n))])
+    if use_total_errors:
+        cmd.append("--use-total-errors")
+    print(f"[internal-refit] running {label}: {' '.join(cmd)}")
     subprocess.run(cmd, check=True)
 
 
@@ -177,6 +240,7 @@ def run_no_feeddown_refit(args, fr_base, out_json):
 
     cmd = [
         sys.executable,
+        "-u",
         "python/fit_blastwave_combined.py",
         "--energy",
         args.energy,
@@ -184,6 +248,8 @@ def run_no_feeddown_refit(args, fr_base, out_json):
         args.centrality,
         "--kernels",
         args.kernels,
+        "--tchem",
+        str(args.tchem),
         "--n-thermal-terms",
         str(args.n_thermal_terms),
         "--n-quantum-terms",
@@ -204,8 +270,12 @@ def run_no_feeddown_refit(args, fr_base, out_json):
         "--results-out",
         str(out_json),
         "--outdir",
-        args.outdir,
+        str(args.other_outdir or args.outdir),
+        "--variation-label",
+        "no_feeddown",
     ]
+    for overlay in args.particle_overlay:
+        cmd.extend(["--particle-overlay", overlay])
     if use_total_errors:
         cmd.append("--use-total-errors")
     if np.isfinite(charge_factor) and abs(charge_factor - 1.0) < 1e-12:
@@ -218,7 +288,8 @@ def main():
     ap = argparse.ArgumentParser(description="Systematic checks for double-ratio method.")
     ap.add_argument("--energy", choices=["2.76", "5.02"], default="2.76")
     ap.add_argument("--centrality", default="0-10")
-    ap.add_argument("--kernels", default="kernels/kernels_scan06_alice.h5")
+    ap.add_argument("--kernels", default="kernels/kernels_scan09_alice.h5")
+    ap.add_argument("--particle-overlay", action="append", default=[])
     ap.add_argument("--fit-results", default="data/fit_results/blastwave_fit_2p76TeV_0_10.json")
     ap.add_argument("--flow-csv", default=None)
     ap.add_argument("--fluidum-csv", default=None, help="Optional FluiduM CSV with columns pt,double_ratio_central[,double_ratio_abs_err].")
@@ -230,9 +301,29 @@ def main():
     ap.add_argument(
         "--summary-rel-unc",
         type=float,
-        default=0.05,
-        help="Fixed relative uncertainty band around the core curve for the summary plot.",
+        default=None,
+        help="Assigned constant relative uncertainty. Default: round the internal envelope upward to the next percent.",
     )
+    ap.add_argument("--internal-pt-min", type=float, default=0.5)
+    ap.add_argument("--internal-pt-max", type=float, default=2.5)
+    ap.add_argument(
+        "--run-internal-refits",
+        action="store_true",
+        help="Run Tchem, total-error weighting, and fit-window refits for the envelope, plus the fixed-n stress test.",
+    )
+    ap.add_argument("--fixed-n-variation", type=float, default=1.0)
+    ap.add_argument(
+        "--run-resonance-content-refits",
+        action="store_true",
+        help="Refit the targeted-completion and standard-PYTHIA kernel variants used only as diagnostics.",
+    )
+    ap.add_argument("--targeted-kernels", default="kernels/kernels_scan08_alice.h5")
+    ap.add_argument(
+        "--targeted-particle-overlay",
+        action="append",
+        default=None,
+    )
+    ap.add_argument("--pythia-kernels", default="kernels/kernels_scan06_alice.h5")
     ap.add_argument("--pt-min", type=float, default=0.05)
     ap.add_argument("--pt-max", type=float, default=3.0)
     ap.add_argument("--pt-step", type=float, default=0.05)
@@ -282,6 +373,8 @@ def main():
 
     pt = np.arange(args.pt_min, args.pt_max + 0.5 * args.pt_step, args.pt_step)
     fr_base = load_fit(args.fit_results)
+    if args.particle_overlay:
+        fr_base["particle_overlays"] = [str(p) for p in args.particle_overlay]
     fr_base["tchem"] = float(args.tchem)
     dr_core, _, pi_over_pi0_core = compute_dr(
         pt,
@@ -389,34 +482,34 @@ def main():
         "tight": {"pi": (0.6, 1.0), "k": (0.2, 1.5), "p": (0.3, 2.0)},
         "broad": {"pi": (0.4, 1.2), "k": (0.0, 1.6), "p": (0.0, 2.2)},
     }
-    curves = {"baseline": dr_core}
-    if write_aux:
-        fits = {"baseline": fr_base}
-        if args.run_fit_window_scan:
-            for name, w in windows.items():
-                if name == "baseline":
-                    continue
-                out_json = other_outdir / f"blastwave_fit_{etag}_{ctag}_{name}.json"
-                run_fit_window(args, name, w, out_json)
-                fits[name] = load_fit(str(out_json))
-        else:
-            # try loading precomputed fit-window files if available
-            for name in ("tight", "broad"):
-                p = other_outdir / f"blastwave_fit_{etag}_{ctag}_{name}.json"
-                if p.exists():
-                    fits[name] = load_fit(str(p))
+    fits = {"baseline": fr_base}
+    if args.run_fit_window_scan or args.run_internal_refits:
+        for name, w in windows.items():
+            if name == "baseline":
+                continue
+            out_json = other_outdir / f"blastwave_fit_{etag}_{ctag}_{name}.json"
+            run_fit_window(args, name, w, out_json)
+            fits[name] = load_fit(str(out_json))
+    else:
+        # Try loading precomputed fit-window files if available.
+        for name in ("tight", "broad"):
+            p = other_outdir / f"blastwave_fit_{etag}_{ctag}_{name}.json"
+            if p.exists():
+                fits[name] = load_fit(str(p))
 
-        curves = {}
-        for name, fr in fits.items():
-            curves[name], _, _ = compute_dr(
-                pt,
-                fr,
-                args.kernels,
-                ratio_source="kernel-total",
-                eta_norm_mode=args.eta_norm_mode,
-                n_thermal_terms=args.n_thermal_terms,
-                n_quantum_terms=args.n_quantum_terms,
-            )
+    curves = {}
+    for name, fr in fits.items():
+        curves[name], _, _ = compute_dr(
+            pt,
+            fr,
+            str(fr.get("kernel_file", args.kernels)),
+            ratio_source="kernel-total",
+            eta_norm_mode=args.eta_norm_mode,
+            n_thermal_terms=args.n_thermal_terms,
+            n_quantum_terms=args.n_quantum_terms,
+        )
+
+    if write_aux:
 
         out3 = other_outdir / f"systematics_fit_windows_{etag}_{ctag}.pdf"
         plt.figure(figsize=(7, 5))
@@ -456,12 +549,96 @@ def main():
     tchem_vals = sorted(set(tchem_vals))
     curves_tchem = {}
     for tc in tchem_vals:
-        fr_tc = dict(fr_base)
-        fr_tc["tchem"] = float(tc)
-        curves_tchem[f"{tc:.3f}"] , _, _ = compute_dr(
+        key = f"{tc:.3f}"
+        if abs(tc - args.tchem) < 1e-12:
+            fr_tc = fr_base
+        else:
+            tc_json = other_outdir / f"blastwave_fit_{etag}_{ctag}_tchem_{int(round(1000.0 * tc))}.json"
+            if args.run_internal_refits:
+                run_internal_refit(args, fr_base, f"tchem_{key}", tc_json, tchem=tc)
+            if tc_json.exists():
+                fr_tc = load_fit(str(tc_json))
+            else:
+                # Legacy fallback for exploratory runs; production internal studies should use refits.
+                fr_tc = dict(fr_base)
+                fr_tc["tchem"] = float(tc)
+        curves_tchem[key], _, _ = compute_dr(
             pt,
             fr_tc,
-            args.kernels,
+            str(fr_tc.get("kernel_file", args.kernels)),
+            ratio_source="kernel-total",
+            eta_norm_mode=args.eta_norm_mode,
+            n_thermal_terms=args.n_thermal_terms,
+            n_quantum_terms=args.n_quantum_terms,
+        )
+
+    extra_internal_fits = {}
+    profile_diagnostic_fits = {}
+    total_json = other_outdir / f"blastwave_fit_{etag}_{ctag}_total_errors.json"
+    fixed_n_tag = str(args.fixed_n_variation).replace(".", "p")
+    fixed_n_json = other_outdir / f"blastwave_fit_{etag}_{ctag}_fixed_n_{fixed_n_tag}.json"
+    if args.run_internal_refits:
+        run_internal_refit(args, fr_base, "total_errors", total_json, use_total_errors=True)
+        run_internal_refit(args, fr_base, f"fixed_n_{args.fixed_n_variation:g}", fixed_n_json, fixed_n=args.fixed_n_variation)
+    if total_json.exists():
+        extra_internal_fits["total_errors"] = load_fit(str(total_json))
+    if fixed_n_json.exists():
+        profile_diagnostic_fits[f"fixed_n_{args.fixed_n_variation:g}"] = load_fit(str(fixed_n_json))
+
+    extra_internal_curves = {}
+    for name, fr_var in extra_internal_fits.items():
+        extra_internal_curves[name], _, _ = compute_dr(
+            pt,
+            fr_var,
+            str(fr_var.get("kernel_file", args.kernels)),
+            ratio_source="kernel-total",
+            eta_norm_mode=args.eta_norm_mode,
+            n_thermal_terms=args.n_thermal_terms,
+            n_quantum_terms=args.n_quantum_terms,
+        )
+    profile_diagnostic_curves = {}
+    for name, fr_var in profile_diagnostic_fits.items():
+        profile_diagnostic_curves[name], _, _ = compute_dr(
+            pt,
+            fr_var,
+            str(fr_var.get("kernel_file", args.kernels)),
+            ratio_source="kernel-total",
+            eta_norm_mode=args.eta_norm_mode,
+            n_thermal_terms=args.n_thermal_terms,
+            n_quantum_terms=args.n_quantum_terms,
+        )
+
+    # Resonance-content variants are deliberately diagnostic only. The standard
+    # PYTHIA list is known to omit states, and the targeted completion is not a
+    # systematic completeness prescription, so neither enters the envelope.
+    resonance_fits = {}
+    targeted_overlays = args.targeted_particle_overlay or [
+        "data/Thermal-FIST 1.6/missing_particles_eta_k_p_auto.cmnd"
+    ]
+    resonance_specs = {
+        "targeted_completion": (args.targeted_kernels, list(targeted_overlays)),
+        "standard_pythia": (args.pythia_kernels, []),
+    }
+    for name, (kernel_path, overlays) in resonance_specs.items():
+        out_json = other_outdir / f"blastwave_fit_{etag}_{ctag}_{name}.json"
+        if args.run_resonance_content_refits:
+            run_internal_refit(
+                args,
+                fr_base,
+                name,
+                out_json,
+                kernels=kernel_path,
+                particle_overlays=overlays,
+            )
+        if out_json.exists():
+            resonance_fits[name] = load_fit(str(out_json))
+
+    resonance_curves = {}
+    for name, fr_var in resonance_fits.items():
+        resonance_curves[name], _, _ = compute_dr(
+            pt,
+            fr_var,
+            str(fr_var.get("kernel_file", resonance_specs[name][0])),
             ratio_source="kernel-total",
             eta_norm_mode=args.eta_norm_mode,
             n_thermal_terms=args.n_thermal_terms,
@@ -504,20 +681,144 @@ def main():
         plt.close()
         print(f"Wrote {out4}")
 
-    # 5) Combined summary plot for paper section
+    # Internal envelope: only full blast-wave + feeddown variations enter.
+    internal_curves = {}
+    for name in ("tight", "broad"):
+        if name in curves:
+            internal_curves[f"fit_{name}"] = curves[name]
+    for key, y in curves_tchem.items():
+        if key != base_key:
+            internal_curves[f"tchem_{key}"] = y
+    internal_curves.update(extra_internal_curves)
+    if not internal_curves:
+        raise RuntimeError(
+            "No internal variations are available. Run once with --run-internal-refits "
+            "or provide the cached variation fit JSON files in --other-outdir."
+        )
+
+    rel_variations = {}
+    for name, y in internal_curves.items():
+        rel_variations[name] = np.abs(
+            np.divide(y - dr_core, dr_core, out=np.full_like(dr_core, np.nan), where=np.isfinite(dr_core) & (dr_core != 0))
+        )
+    if rel_variations:
+        rel_stack = np.vstack(list(rel_variations.values()))
+        rel_internal_env = np.full(rel_stack.shape[1], np.nan, dtype=float)
+        valid_col = np.any(np.isfinite(rel_stack), axis=0)
+        rel_internal_env[valid_col] = np.nanmax(rel_stack[:, valid_col], axis=0)
+    else:
+        rel_internal_env = np.zeros_like(dr_core)
+    m_internal = (
+        np.isfinite(pt)
+        & (pt >= float(args.internal_pt_min))
+        & (pt <= float(args.internal_pt_max))
+        & np.isfinite(rel_internal_env)
+    )
+    max_internal_rel = float(np.nanmax(rel_internal_env[m_internal])) if np.any(m_internal) else 0.0
+    if args.summary_rel_unc is None:
+        assigned_rel = np.ceil(max_internal_rel * 100.0 - 1e-12) / 100.0
+    else:
+        assigned_rel = max(0.0, float(args.summary_rel_unc))
+        if assigned_rel + 1e-12 < max_internal_rel:
+            raise ValueError(
+                f"Assigned relative uncertainty {assigned_rel:.6g} does not cover "
+                f"the internal envelope maximum {max_internal_rel:.6g}."
+            )
+    print(
+        f"Internal envelope: max={100.0 * max_internal_rel:.3f}% in "
+        f"{args.internal_pt_min:g} <= pT <= {args.internal_pt_max:g} GeV/c; "
+        f"assigned constant={100.0 * assigned_rel:.1f}%"
+    )
+
+    summary_json = other_outdir / f"systematics_internal_summary_{etag}_{ctag}.json"
+    with open(summary_json, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "baseline_fit": args.fit_results,
+                "internal_variations": sorted(internal_curves),
+                "internal_pt_range": [float(args.internal_pt_min), float(args.internal_pt_max)],
+                "max_internal_relative_deviation": max_internal_rel,
+                "assigned_constant_relative_uncertainty": assigned_rel,
+                "external_comparisons_in_envelope": [],
+                "diagnostic_variations_excluded_from_envelope": sorted(
+                    list(profile_diagnostic_curves)
+                    + list(resonance_curves)
+                    + ["flow_scaling", "no_feeddown", "FluiduM"]
+                ),
+            },
+            f,
+            indent=2,
+        )
+    print(f"Wrote {summary_json}")
+
+    if write_aux:
+        out_internal = other_outdir / f"systematics_internal_all_{etag}_{ctag}.pdf"
+        plt.figure(figsize=(7, 5))
+        plt.plot(pt, dr_core, "-", lw=2.4, color="C0", label="baseline")
+        for name, y in internal_curves.items():
+            plt.plot(pt, y, lw=1.4, alpha=0.8, label=name.replace("_", " "))
+        plt.xlabel(r"$p_T$ (GeV/$c$)")
+        plt.ylabel(r"$(\eta/\pi^0)/(K^+/\pi^+)$")
+        plt.grid(alpha=0.3)
+        plt.legend(frameon=False, fontsize=10)
+        plt.tight_layout()
+        plt.savefig(out_internal)
+        plt.close()
+        print(f"Wrote {out_internal}")
+
+        out_all = other_outdir / f"systematics_all_variations_{etag}_{ctag}.pdf"
+        plt.figure(figsize=(7, 5))
+        plt.plot(pt, dr_core, "-", lw=2.5, color="C0", label="baseline")
+        for name, y in internal_curves.items():
+            plt.plot(pt, y, lw=1.2, alpha=0.75, label=f"internal: {name.replace('_', ' ')}")
+        for name, y in resonance_curves.items():
+            plt.plot(pt, y, "--", lw=1.5, alpha=0.85, label=f"diagnostic: {name.replace('_', ' ')}")
+        for name, y in profile_diagnostic_curves.items():
+            plt.plot(pt, y, "--", lw=1.5, alpha=0.85, label=f"diagnostic: {name.replace('_', ' ')}")
+        plt.plot(pt, dr_flow, ":", lw=1.4, color="0.35", label="diagnostic: flow scaling")
+        plt.plot(pt, dr_nofd, "-.", lw=1.4, color="0.55", label="diagnostic: no feeddown")
+        if dr_fluidum is not None:
+            mf = np.isfinite(pt) & np.isfinite(dr_fluidum)
+            plt.plot(pt[mf], dr_fluidum[mf], "-", lw=1.8, color="black", label="FluiduM (external cross-check)")
+        plt.xlabel(r"$p_T$ (GeV/$c$)")
+        plt.ylabel(r"$(\eta/\pi^0)/(K^+/\pi^+)$")
+        plt.grid(alpha=0.3)
+        plt.legend(frameon=False, fontsize=8, ncol=2)
+        plt.tight_layout()
+        plt.savefig(out_all)
+        plt.close()
+        print(f"Wrote {out_all}")
+
+    representative_names = []
+    representative_labels = {}
+    # Show both sides of the T_chem variation in the paper figure. The other
+    # internal variations remain part of the numerical envelope and are
+    # available in the complete diagnostic plots.
+    tchem_names = sorted(
+        (name for name in internal_curves if name.startswith("tchem_")),
+        key=lambda name: float(name.removeprefix("tchem_")),
+    )
+    for name in tchem_names:
+        representative_names.append(name)
+        tchem_mev = 1000.0 * float(name.removeprefix("tchem_"))
+        representative_labels[name] = rf"$T_{{\mathrm{{chem}}}}={tchem_mev:.0f}$ MeV"
+
+    # 5) Curated summary plot for the paper section
     out5 = outdir / f"systematics_summary_{etag}_{ctag}.pdf"
     plt.figure(figsize=(7, 5))
-    x_ends = [last_finite_pt(pt, dr_core), last_finite_pt(pt, dr_nofd), last_finite_pt(pt, dr_flow)]
+    x_ends = [last_finite_pt(pt, dr_core)]
     if dr_fluidum is not None:
         x_ends.append(last_finite_pt(pt, dr_fluidum))
-    for y in curves_tchem.values():
+    x_ends.append(last_finite_pt(pt, dr_flow))
+    x_ends.append(last_finite_pt(pt, dr_nofd))
+    for name in representative_names:
+        y = internal_curves[name]
         x_ends.append(last_finite_pt(pt, y))
     x_ends = [x for x in x_ends if np.isfinite(x)]
     x_common_max = min(x_ends) if x_ends else float(args.pt_max)
     msum = np.isfinite(pt) & (pt <= x_common_max)
-    rel = max(0.0, float(args.summary_rel_unc))
-    lo_core = dr_core * (1.0 - rel)
-    hi_core = dr_core * (1.0 + rel)
+    lo_core = dr_core * (1.0 - assigned_rel)
+    hi_core = dr_core * (1.0 + assigned_rel)
     mband = msum & np.isfinite(lo_core) & np.isfinite(hi_core)
     if np.any(mband):
         plt.fill_between(
@@ -527,31 +828,45 @@ def main():
             color="0.80",
             alpha=0.5,
             linewidth=0,
-            label=rf"fixed uncertainty band ($\pm {100.0*rel:.0f}\%$)",
+            label=rf"assigned uncertainty ($\pm {100.0*assigned_rel:.0f}\%$)",
         )
     plt.plot(pt[msum], dr_core[msum], "-", lw=2.4, color="C0", label="core (with feeddown)")
-    plt.plot(pt[msum], dr_nofd[msum], "--", lw=2.0, color="C3", label=nofd_label)
-    plt.plot(pt[msum], dr_flow[msum], "-.", lw=2.0, color="C1", label="flow-scaling")
+    styles = ["--", "-.", ":", (0, (3, 1, 1, 1))]
+    colors = ["C1", "C2", "C3", "C4"]
+    for i, name in enumerate(representative_names):
+        y = internal_curves[name]
+        m_var = msum & np.isfinite(y)
+        plt.plot(
+            pt[m_var], y[m_var], linestyle=styles[i % len(styles)], lw=1.4,
+            color=colors[i % len(colors)], alpha=0.75,
+            label=representative_labels[name],
+        )
+    m_flow = msum & np.isfinite(dr_flow)
+    plt.plot(
+        pt[m_flow],
+        dr_flow[m_flow],
+        linestyle=(0, (1, 1)),
+        lw=1.5,
+        color="0.45",
+        label="flow scaling (cross-check)",
+    )
+    m_nofd = msum & np.isfinite(dr_nofd)
+    plt.plot(
+        pt[m_nofd],
+        dr_nofd[m_nofd],
+        linestyle=(0, (5, 2)),
+        lw=1.5,
+        color="0.60",
+        label="no-feeddown hybrid (cross-check)",
+    )
     if dr_fluidum is not None:
         mf = msum & np.isfinite(dr_fluidum)
-        plt.plot(pt[mf], dr_fluidum[mf], "-", lw=2.0, color="0.25", label="FluiduM")
-    for key, y in curves_tchem.items():
-        if key == base_key:
-            continue
-        m_tc = msum & np.isfinite(y)
-        plt.plot(pt[m_tc], y[m_tc], ":", lw=1.8, color="C2", alpha=0.9)
-    n_tchem_var = max(0, len(curves_tchem) - (1 if base_key in curves_tchem else 0))
-    if n_tchem_var > 0:
-        tc_min = float(np.min(tchem_vals))
-        tc_max = float(np.max(tchem_vals))
-        tc_min_mev = int(round(1000.0 * tc_min))
-        tc_max_mev = int(round(1000.0 * tc_max))
-        plt.plot([], [], ":", lw=1.8, color="C2", label=rf"$T_{{\mathrm{{ch}}}}$ variations ({tc_min_mev} MeV, {tc_max_mev} MeV)")
+        plt.plot(pt[mf], dr_fluidum[mf], "-", lw=2.0, color="0.15", label="FluiduM (external cross-check)")
     plt.xlabel(r"$p_T$ (GeV/$c$)")
     plt.ylabel(r"$(\eta/\pi^0)/(K^+/\pi^+)$")
     plt.xlim(float(args.pt_min), x_common_max)
     plt.grid(alpha=0.3)
-    plt.legend(frameon=False, fontsize=12)
+    plt.legend(frameon=False, fontsize=10.5)
     plt.tight_layout()
     plt.savefig(out5)
     plt.close()
@@ -559,6 +874,19 @@ def main():
 
     # dump numeric curves for later use
     if write_aux:
+        out_internal_csv = other_outdir / f"systematics_internal_double_ratio_curves_{etag}_{ctag}.csv"
+        internal_names = list(internal_curves)
+        internal_mat = [pt, dr_core] + [internal_curves[name] for name in internal_names] + [rel_internal_env]
+        internal_header = ",".join(["pt", "core"] + internal_names + ["internal_envelope_relative"])
+        np.savetxt(
+            out_internal_csv,
+            np.vstack(internal_mat).T,
+            delimiter=",",
+            header=internal_header,
+            comments="",
+        )
+        print(f"Wrote {out_internal_csv}")
+
         out_csv = other_outdir / f"systematics_double_ratio_curves_{etag}_{ctag}.csv"
         tchem_cols = [f"tchem_{k}" for k in curves_tchem.keys()]
         names = ["pt", "core", "flow", "no_feeddown"]
@@ -568,6 +896,10 @@ def main():
             mat.append(dr_fluidum)
         names += [k for k in ("tight", "broad") if k in curves] + tchem_cols
         mat += [curves[k] for k in ("tight", "broad") if k in curves] + [curves_tchem[k] for k in curves_tchem.keys()]
+        names += list(resonance_curves)
+        mat += [resonance_curves[k] for k in resonance_curves]
+        names += list(profile_diagnostic_curves)
+        mat += [profile_diagnostic_curves[k] for k in profile_diagnostic_curves]
         arr = np.vstack(mat).T
         header = ",".join(names)
         np.savetxt(out_csv, arr, delimiter=",", header=header, comments="")

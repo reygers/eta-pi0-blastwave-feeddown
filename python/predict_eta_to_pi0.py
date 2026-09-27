@@ -15,6 +15,7 @@ from blastwave_model import (
     thermal_yield as bw_thermal_yield,
     load_masses as bw_load_masses,
     build_primary_spectra as bw_build_primary_spectra,
+    require_mother_properties,
     rebin_spectrum,
 )
 from kernels import load_kernel_file, load_species, compute_feeddown_binned, bin_centers
@@ -233,84 +234,40 @@ def measured_rel_unc_reference(pt, ratio, yerr, pt_min=3.0, pt_max=4.0):
     return float(np.mean(rel))
 
 
-def systematics_rel_band_profile(pt_dense, csv_path, pt_data=None, ratio_data=None, yerr_data=None):
-    arr = np.genfromtxt(csv_path, delimiter=",", names=True, dtype=float, encoding=None)
-    if arr.size == 0 or arr.dtype.names is None:
-        raise RuntimeError(f"No rows/columns found in {csv_path}")
-    names = list(arr.dtype.names)
-    if "pt" not in names or "core" not in names:
-        raise RuntimeError(f"CSV {csv_path} must contain columns: pt,core")
-
-    x = np.asarray(arr["pt"], dtype=float)
-    core = np.asarray(arr["core"], dtype=float)
-    m0 = np.isfinite(x) & np.isfinite(core)
-    x = x[m0]
-    core = core[m0]
-    if x.size < 2:
-        raise RuntimeError(f"Insufficient valid pt/core rows in {csv_path}")
-    order = np.argsort(x)
-    x = x[order]
-    core = core[order]
-
-    var_cols = [n for n in names if n not in {"pt", "core"}]
-    rel_stack = []
-    for n in var_cols:
-        y = np.asarray(arr[n], dtype=float)
-        y = y[m0][order]
-        rel = np.abs(np.divide(y - core, core, out=np.full_like(core, np.nan), where=np.isfinite(core) & (core != 0)))
-        if np.any(np.isfinite(rel)):
-            rel_stack.append(rel)
-    if not rel_stack:
-        raise RuntimeError(f"No valid variation columns in {csv_path}")
-
-    rel_env = np.nanmax(np.vstack(rel_stack), axis=0)
-    rel_env = np.where(np.isfinite(rel_env) & (rel_env >= 0), rel_env, np.nan)
-
-    # Reference from the systematic envelope in the pseudo-data-dominated region.
-    rel_at_2p5 = np.interp(2.5, x, rel_env, left=np.nan, right=np.nan)
-    if not np.isfinite(rel_at_2p5):
-        m_le2p5 = np.isfinite(rel_env) & (x <= 2.5)
-        if np.any(m_le2p5):
-            rel_at_2p5 = float(rel_env[m_le2p5][-1])
-        else:
-            m_any = np.isfinite(rel_env)
-            rel_at_2p5 = float(np.nanmedian(rel_env[m_any])) if np.any(m_any) else np.nan
-    if not np.isfinite(rel_at_2p5):
-        raise RuntimeError(f"Could not determine relative uncertainty at 2.5 GeV/c from {csv_path}")
-
-    # Reference at 3 GeV/c from the systematic envelope.
-    rel_at_3 = np.interp(3.0, x, rel_env, left=np.nan, right=np.nan)
-    if not np.isfinite(rel_at_3):
-        m_le3 = np.isfinite(rel_env) & (x <= 3.0)
-        if np.any(m_le3):
-            rel_at_3 = float(rel_env[m_le3][-1])
-        else:
-            m_any = np.isfinite(rel_env)
-            rel_at_3 = float(np.nanmedian(rel_env[m_any])) if np.any(m_any) else np.nan
-    if not np.isfinite(rel_at_3):
-        raise RuntimeError(f"Could not determine relative uncertainty at 3 GeV/c from {csv_path}")
-
-    rel_data_3to4 = np.nan
+def assigned_piecewise_rel_band(
+    pt_dense,
+    low_rel_unc,
+    pt_data=None,
+    ratio_data=None,
+    yerr_data=None,
+    low_pt_max=2.5,
+    data_anchor_pt=4.0,
+    high_pt_start=5.0,
+    high_rel_unc=0.05,
+):
+    """Piecewise relative band with an explicitly assigned correlated low-pT model uncertainty."""
+    low_rel_unc = max(0.0, float(low_rel_unc))
+    high_rel_unc = max(0.0, float(high_rel_unc))
+    rel_data = np.nan
     if pt_data is not None and ratio_data is not None and yerr_data is not None:
-        rel_data_3to4 = measured_rel_unc_reference(pt_data, ratio_data, yerr_data, pt_min=3.0, pt_max=4.0)
-    if not np.isfinite(rel_data_3to4):
-        rel_data_3to4 = rel_at_3
+        rel_data = measured_rel_unc_reference(pt_data, ratio_data, yerr_data, pt_min=3.0, pt_max=4.0)
+    if not np.isfinite(rel_data):
+        rel_data = low_rel_unc
 
+    pt_dense = np.asarray(pt_dense, dtype=float)
     rel = np.full_like(pt_dense, np.nan, dtype=float)
-
-    m_lo = pt_dense <= 2.5
-    rel[m_lo] = np.interp(pt_dense[m_lo], x, rel_env, left=rel_env[np.isfinite(rel_env)][0], right=rel_at_2p5)
-
-    m_rise = (pt_dense > 2.5) & (pt_dense < 4.0)
-    rel[m_rise] = rel_at_2p5 + (rel_data_3to4 - rel_at_2p5) * ((pt_dense[m_rise] - 2.5) / 1.5)
-
-    m_fall = (pt_dense >= 4.0) & (pt_dense < 5.0)
-    rel[m_fall] = rel_data_3to4 + (0.05 - rel_data_3to4) * ((pt_dense[m_fall] - 4.0) / 1.0)
-
-    m_hi = pt_dense >= 5.0
-    rel[m_hi] = 0.05
-    rel = np.where(np.isfinite(rel), np.maximum(rel, 0.0), np.nan)
-    return rel, rel_at_2p5, rel_data_3to4
+    m_low = pt_dense <= low_pt_max
+    rel[m_low] = low_rel_unc
+    m_mid = (pt_dense > low_pt_max) & (pt_dense < data_anchor_pt)
+    if np.any(m_mid):
+        u = (pt_dense[m_mid] - low_pt_max) / (data_anchor_pt - low_pt_max)
+        rel[m_mid] = low_rel_unc + (rel_data - low_rel_unc) * u
+    m_high_transition = (pt_dense >= data_anchor_pt) & (pt_dense < high_pt_start)
+    if np.any(m_high_transition):
+        u = (pt_dense[m_high_transition] - data_anchor_pt) / (high_pt_start - data_anchor_pt)
+        rel[m_high_transition] = rel_data + (high_rel_unc - rel_data) * u
+    rel[pt_dense >= high_pt_start] = high_rel_unc
+    return rel, rel_data
 
 
 def load_fit_results(path: str):
@@ -437,6 +394,7 @@ def build_model_ratios_kernel_total(
     n_thermal_terms=1,
     n_quantum_terms=1,
     decaytable="data/decaytables/decaytable_pythia8.dat",
+    particle_overlays=None,
     eta_scale=1.0,
 ):
     needed = {
@@ -458,7 +416,8 @@ def build_model_ratios_kernel_total(
     # Build primary mother spectra on common mother pT grid.
     mids = np.unique(np.concatenate([specs[k]["mother_ids"] for k in needed])).astype(int)
     pt_edges_m = specs["pi_plus"]["pt_edges_mother"]
-    masses = bw_load_masses(decaytable)
+    masses = bw_load_masses(decaytable, overlay_paths=particle_overlays)
+    require_mother_properties(mids, masses, context=f"Kernel file '{kernels_path}'")
     primary = bw_build_primary_spectra(
         mother_ids=mids,
         pt_edges_mother=pt_edges_m,
@@ -488,7 +447,14 @@ def main():
     ap = argparse.ArgumentParser(description="Initial eta/pi0 prediction script: plot measured eta/pi0 points.")
     ap.add_argument("--energy", choices=["2.76", "5.02"], default="2.76", help="Collision energy in TeV.")
     ap.add_argument("--centrality", required=True, help="Centrality class, energy-dependent (e.g. 0-10, 30-50).")
-    ap.add_argument("--kernels", default="kernels/kernels_scan06_alice.h5", help="Kernel file used for kernel-total model ratios.")
+    ap.add_argument("--kernels", default="kernels/kernels_scan09_alice.h5", help="Kernel file used for kernel-total model ratios.")
+    ap.add_argument("--decaytable", default="data/decaytables/decaytable_pythia8.dat")
+    ap.add_argument(
+        "--particle-overlay",
+        action="append",
+        default=[],
+        help="Particle-data .cmnd overlay matching the kernel mothers; may be repeated.",
+    )
     ap.add_argument(
         "--ratio-source",
         choices=["kernel-total", "primary-only"],
@@ -580,14 +546,27 @@ def main():
     ap.add_argument(
         "--show-estimated-band",
         action="store_true",
-        help="Draw relative band from systematics curves for pT<=3, then linearly to 5%% at 5 GeV/c, then 5%%.",
+        help="Draw the assigned piecewise relative uncertainty band.",
     )
     ap.add_argument(
-        "--systematics-curves-csv",
+        "--low-pt-model-rel-unc",
+        type=float,
         default=None,
-        help="Optional path to systematics_double_ratio_curves CSV; default: outputs/current/systematics_double_ratio_curves_<energy>TeV_<cent>.csv",
+        help="Assigned correlated relative model uncertainty for pT <= 2.5 GeV/c (overrides summary JSON).",
+    )
+    ap.add_argument(
+        "--systematics-summary-json",
+        default=None,
+        help="JSON containing assigned_constant_relative_uncertainty from the internal systematic study.",
     )
     args = ap.parse_args()
+    low_pt_model_rel_unc = args.low_pt_model_rel_unc
+    if low_pt_model_rel_unc is None and args.systematics_summary_json:
+        with open(args.systematics_summary_json, "r", encoding="utf-8") as f:
+            sys_summary = json.load(f)
+        low_pt_model_rel_unc = float(sys_summary["assigned_constant_relative_uncertainty"])
+    if low_pt_model_rel_unc is None:
+        low_pt_model_rel_unc = 0.05
     energy_tag = f"{args.energy.replace('.', 'p')}TeV"
     allowed = supported_eta_pi0_centralities(args.energy)
     if args.centrality not in allowed:
@@ -698,6 +677,8 @@ def main():
     pseudo_pack = None
     if (not args.no_pseudo) and os.path.exists(fit_results_path):
         fr = load_fit_results(fit_results_path)
+        particle_overlays = args.particle_overlay or fr.get("particle_overlays", [])
+        decaytable = str(fr.get("decaytable", args.decaytable))
         pars = fr.get("params", {})
         tkin = float(pars["Tkin"])
         beta_s = float(pars["beta_s"])
@@ -730,6 +711,8 @@ def main():
                     beta_s,
                     n_profile,
                     kernels_path=args.kernels,
+                    decaytable=decaytable,
+                    particle_overlays=particle_overlays,
                     n_thermal_terms=n_thermal_terms,
                     n_quantum_terms=n_quantum_terms,
                     eta_scale=eta_scale,
@@ -851,6 +834,8 @@ def main():
                                         bs,
                                         ns,
                                         kernels_path=args.kernels,
+                                        decaytable=decaytable,
+                                        particle_overlays=particle_overlays,
                                         n_thermal_terms=n_thermal_terms,
                                         n_quantum_terms=n_quantum_terms,
                                         eta_scale=eta_scale_s,
@@ -1073,33 +1058,17 @@ def main():
             print(f"Combined fit ({fit_model.name}): chi2/ndf = {chi2_c:.3f}/{ndf_c} = {(chi2_c/ndf_c if ndf_c>0 else np.nan):.3f}")
 
             if args.show_estimated_band:
-                sys_csv = args.systematics_curves_csv
-                if sys_csv is None:
-                    sys_csv = os.path.join(
-                        "figures",
-                        "current",
-                        f"systematics_double_ratio_curves_{energy_tag}_{ctag}.csv",
-                    )
-                try:
-                    rel, rel_at_2p5, rel_data_3to4 = systematics_rel_band_profile(
-                        pt_dense,
-                        sys_csv,
-                        pt_data=pt,
-                        ratio_data=ratio,
-                        yerr_data=yerr,
-                    )
-                    print(
-                        f"Estimated band from systematics: {sys_csv} "
-                        f"(rel@2.5GeV/c={rel_at_2p5:.4f}, "
-                        f"mean data rel[3,4]GeV/c={rel_data_3to4:.4f}, rel>=5GeV/c=0.0500)"
-                    )
-                except Exception as exc:
-                    print(f"Warning: failed to build systematics-based band ({exc}); falling back to legacy heuristic.")
-                    rel = np.where(
-                        pt_dense <= 1.0,
-                        0.15,
-                        np.where(pt_dense >= 5.0, 0.05, 0.15 - (pt_dense - 1.0) * (0.10 / 4.0)),
-                    )
+                rel, rel_data_3to4 = assigned_piecewise_rel_band(
+                    pt_dense,
+                    low_pt_model_rel_unc,
+                    pt_data=pt,
+                    ratio_data=ratio,
+                    yerr_data=yerr,
+                )
+                print(
+                    f"Assigned piecewise band: low-pT={low_pt_model_rel_unc:.4f}, "
+                    f"mean data rel[3,4]GeV/c={rel_data_3to4:.4f}, rel>=5GeV/c=0.0500"
+                )
                 band_rel_dense = rel
                 y_comb_lo = y_comb * (1.0 - rel)
                 y_comb_hi = y_comb * (1.0 + rel)
@@ -1291,7 +1260,7 @@ def main():
         plt.close()
         print(f"Wrote {out_kch}")
 
-    if (not args.main_plot_only) and pseudo_rows:
+    if pseudo_rows:
         if args.pseudo_csv_out is None:
             pseudo_csv_out = os.path.join(args.outdir, f"eta_to_pi0_pseudo_{energy_tag}_{ctag}.csv")
         else:

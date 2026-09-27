@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import json
 import os
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib-cache")
@@ -20,7 +21,7 @@ from fit_flow_scaling import (
     solve_for_beta,
 )
 from kernels import bin_centers, load_kernel_file, load_species
-from predict_eta_to_pi0 import model_blast_switch, systematics_rel_band_profile
+from predict_eta_to_pi0 import assigned_piecewise_rel_band, model_blast_switch
 
 
 PDG_LATEX = {
@@ -209,10 +210,11 @@ def main():
     ap.add_argument("--eta-pi0-p0", type=float, default=3.76559)
     ap.add_argument("--eta-pi0-d", type=float, default=2.622)
     ap.add_argument("--eta-pi0-r", type=float, default=0.487)
+    ap.add_argument("--low-pt-model-rel-unc", type=float, default=None)
     ap.add_argument(
-        "--systematics-curves-csv",
-        default="outputs/current/systematics_double_ratio_curves_2p76TeV_0_10.csv",
-        help="CSV used to derive relative eta/pi0 uncertainty profile.",
+        "--systematics-summary-json",
+        default="outputs/current/systematics_internal_summary_2p76TeV_0_10.json",
+        help="JSON containing the assigned low-pT relative model uncertainty.",
     )
     ap.add_argument(
         "--eta-pi0-curve-csv",
@@ -268,6 +270,12 @@ def main():
         help="Show preequilibrium/decay curve in the lower panel.",
     )
     args = ap.parse_args()
+    low_pt_model_rel_unc = args.low_pt_model_rel_unc
+    if low_pt_model_rel_unc is None and args.systematics_summary_json:
+        with open(args.systematics_summary_json, "r", encoding="utf-8") as f:
+            low_pt_model_rel_unc = float(json.load(f)["assigned_constant_relative_uncertainty"])
+    if low_pt_model_rel_unc is None:
+        low_pt_model_rel_unc = 0.05
 
     plt.rcParams.update(
         {
@@ -341,7 +349,7 @@ def main():
                         args.eta_pi0_d,
                         args.eta_pi0_r,
                     )
-                    rel = systematics_rel_band_profile(pt_m, args.systematics_curves_csv)[0]
+                    rel = assigned_piecewise_rel_band(pt_m, low_pt_model_rel_unc)[0]
                     rel = np.where(np.isfinite(rel) & (rel >= 0), rel, 0.0)
                     r_eta_pi0_lo = r_eta_pi0_c * (1.0 - rel)
                     r_eta_pi0_hi = r_eta_pi0_c * (1.0 + rel)

@@ -127,8 +127,16 @@ def parse_overlay_cmnd_masses(path: str) -> Dict[int, Tuple[float, int]]:
     return masses
 
 
-def candidate_overlay_cmnd_paths(decaytable_path: str) -> list[str]:
+def candidate_overlay_cmnd_paths(decaytable_path: str, overlay_paths=None) -> list[str]:
     candidates = []
+    if overlay_paths:
+        if isinstance(overlay_paths, (str, os.PathLike)):
+            overlay_paths = [overlay_paths]
+        candidates.extend(str(Path(p).resolve()) for p in overlay_paths)
+        # An explicit list defines the particle content paired with the kernel.
+        # Do not silently mix in a legacy auto-discovered overlay.
+        return list(dict.fromkeys(candidates))
+
     env_path = os.environ.get("PYTHIA_OVERLAY_CMND")
     if env_path:
         candidates.append(env_path)
@@ -150,17 +158,30 @@ def candidate_overlay_cmnd_paths(decaytable_path: str) -> list[str]:
     return out
 
 
-def load_masses(decaytable_path: str) -> Dict[int, Tuple[float, int]]:
+def load_masses(decaytable_path: str, overlay_paths=None) -> Dict[int, Tuple[float, int]]:
     xml_path = pythia_xmldoc_path()
     if xml_path:
         masses = parse_pythia_xml_masses(xml_path)
     else:
         masses = parse_decaytable_masses(decaytable_path)
 
-    for overlay_path in candidate_overlay_cmnd_paths(decaytable_path):
+    for overlay_path in candidate_overlay_cmnd_paths(decaytable_path, overlay_paths=overlay_paths):
         if os.path.exists(overlay_path):
             masses.update(parse_overlay_cmnd_masses(overlay_path))
     return masses
+
+
+def require_mother_properties(mother_ids, masses, context: str = "kernel") -> None:
+    """Fail early when a decay kernel contains mothers without thermal properties."""
+    missing = sorted({abs(int(pid)) for pid in mother_ids if abs(int(pid)) not in masses})
+    if not missing:
+        return
+    preview = ", ".join(str(pid) for pid in missing[:12])
+    suffix = "" if len(missing) <= 12 else f", ... ({len(missing)} total)"
+    raise RuntimeError(
+        f"{context} contains mother particles without known mass/spin properties: "
+        f"{preview}{suffix}. Supply the matching particle overlay explicitly."
+    )
 
 
 def k2_bessel(x: np.ndarray) -> np.ndarray:
@@ -235,12 +256,17 @@ def blastwave_shape(
         try:
             import mpmath as mp
 
-            i0_fn = lambda x: np.array([float(mp.besseli(0, xi)) for xi in x])
-            k1_fn = lambda x: np.array([float(mp.besselk(1, xi)) for xi in x])
+            i0_fn = lambda x: np.array(
+                [float(mp.besseli(0, xi)) for xi in np.asarray(x).ravel()]
+            ).reshape(np.shape(x))
+            k1_fn = lambda x: np.array(
+                [float(mp.besselk(1, xi)) for xi in np.asarray(x).ravel()]
+            ).reshape(np.shape(x))
             have_scaled = False
         except Exception as exc:
             raise RuntimeError("Need scipy or mpmath for I0/K1.") from exc
 
+    pt = np.asarray(pt, dtype=float)
     mt = np.sqrt(pt ** 2 + mass ** 2)
     r = np.linspace(0.0, 1.0, 80)
     rho = np.arctanh(beta_s * np.power(r, n_profile))
@@ -251,26 +277,23 @@ def blastwave_shape(
     # dN/dpT ~ pT * Σ_k sign_k ∫ r * mT * I0(k*xip) * K1(k*xim) dr
     # with sign_k = (-1)^(k+1) for fermions, +1 for bosons.
     # Shape only; overall normalization handled elsewhere.
-    shape = np.zeros_like(pt)
-    for i, p in enumerate(pt):
-        arg_i0_base = p * np.sinh(rho) / tkin
-        arg_k1_base = mt[i] * np.cosh(rho) / tkin
-        sum_k = np.zeros_like(r)
-        for k in range(1, n_q + 1):
-            sign = -1.0 if (is_fermion and (k % 2 == 0)) else 1.0
-            arg_i0 = k * arg_i0_base
-            arg_k1 = k * arg_k1_base
-            if have_scaled:
-                # Numerically stable product: i0(x) * k1(y) = i0e(x) * k1e(y) * exp(x-y)
-                expo = np.clip(arg_i0 - arg_k1, -700.0, 700.0)
-                prod = i0e_fn(arg_i0) * k1e_fn(arg_k1) * np.exp(expo)
-            else:
-                prod = i0_fn(arg_i0) * k1_fn(arg_k1)
-            sum_k += sign * prod
-        integrand = r * mt[i] * sum_k
-        integrand = np.nan_to_num(integrand, nan=0.0, posinf=0.0, neginf=0.0)
-        shape[i] = p * np.trapezoid(integrand, r)
-    return shape
+    arg_i0_base = pt[:, None] * np.sinh(rho)[None, :] / tkin
+    arg_k1_base = mt[:, None] * np.cosh(rho)[None, :] / tkin
+    sum_k = np.zeros_like(arg_i0_base)
+    for k in range(1, n_q + 1):
+        sign = -1.0 if (is_fermion and (k % 2 == 0)) else 1.0
+        arg_i0 = k * arg_i0_base
+        arg_k1 = k * arg_k1_base
+        if have_scaled:
+            # Numerically stable product: i0(x) * k1(y) = i0e(x) * k1e(y) * exp(x-y)
+            expo = np.clip(arg_i0 - arg_k1, -700.0, 700.0)
+            prod = i0e_fn(arg_i0) * k1e_fn(arg_k1) * np.exp(expo)
+        else:
+            prod = i0_fn(arg_i0) * k1_fn(arg_k1)
+        sum_k += sign * prod
+    integrand = r[None, :] * mt[:, None] * sum_k
+    integrand = np.nan_to_num(integrand, nan=0.0, posinf=0.0, neginf=0.0)
+    return pt * np.trapezoid(integrand, r, axis=1)
 
 
 def build_primary_spectra(
@@ -293,9 +316,13 @@ def build_primary_spectra(
     widths = np.diff(pt_edges_mother)
 
     yields = {}
+    yield_by_abs_pid = {}
     for pid in mother_ids:
-        m, g = masses.get(abs(pid), (0.0, 1))
-        yields[pid] = thermal_yield(m, g, tchem, n_terms=n_thermal_terms)
+        apid = abs(int(pid))
+        if apid not in yield_by_abs_pid:
+            m, g = masses.get(apid, (0.0, 1))
+            yield_by_abs_pid[apid] = thermal_yield(m, g, tchem, n_terms=n_thermal_terms)
+        yields[pid] = yield_by_abs_pid[apid]
 
     ref_pid = 211
     ref = yields.get(ref_pid, 1.0)
@@ -305,17 +332,21 @@ def build_primary_spectra(
         yields[pid] /= ref
 
     spectra = {}
+    shape_by_abs_pid = {}
     for pid in mother_ids:
-        m, g = masses.get(abs(pid), (0.0, 1))
-        shape = blastwave_shape(
-            pt_centers,
-            m,
-            tkin,
-            beta_s,
-            n_profile,
-            spin_type=g,
-            n_quantum_terms=n_quantum_terms,
-        )
+        apid = abs(int(pid))
+        if apid not in shape_by_abs_pid:
+            m, g = masses.get(apid, (0.0, 1))
+            shape_by_abs_pid[apid] = blastwave_shape(
+                pt_centers,
+                m,
+                tkin,
+                beta_s,
+                n_profile,
+                spin_type=g,
+                n_quantum_terms=n_quantum_terms,
+            )
+        shape = shape_by_abs_pid[apid]
         norm = np.sum(shape * widths)
         if norm <= 0:
             spectra[pid] = np.zeros_like(pt_centers)

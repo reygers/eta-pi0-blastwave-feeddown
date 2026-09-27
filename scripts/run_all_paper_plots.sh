@@ -9,12 +9,14 @@ PYTHON_BIN="${PYTHON_BIN:-.venv/bin/python}"
 NTHERM="${NTHERM:-10}"
 NQUANT="${NQUANT:-10}"
 KERNELS="${KERNELS:-kernels/kernels_scan09_alice.h5}"
+PARTICLE_OVERLAY="${PARTICLE_OVERLAY:-data/Thermal-FIST 1.6/missing_particles_all_lt2gev_tau1mm.cmnd}"
 
 echo "[1/10] blast-wave fit"
 "$PYTHON_BIN" python/fit_blastwave_combined.py \
   --energy 2.76 \
   --centrality 0-10 \
   --kernels "$KERNELS" \
+  --particle-overlay "$PARTICLE_OVERLAY" \
   --n-thermal-terms "$NTHERM" \
   --n-quantum-terms "$NQUANT" \
   --outdir paper/figures
@@ -24,6 +26,7 @@ echo "[2/10] double-ratio plot"
   --energy 2.76 \
   --centrality 0-10 \
   --kernels "$KERNELS" \
+  --particle-overlay "$PARTICLE_OVERLAY" \
   --fit-results data/fit_results/blastwave_fit_2p76TeV_0_10.json \
   --n-thermal-terms "$NTHERM" \
   --n-quantum-terms "$NQUANT" \
@@ -61,13 +64,15 @@ echo "[5/10] systematics summary"
   --energy 2.76 \
   --centrality 0-10 \
   --kernels "$KERNELS" \
+  --particle-overlay "$PARTICLE_OVERLAY" \
   --fit-results data/fit_results/blastwave_fit_2p76TeV_0_10.json \
   --flow-csv outputs/current/flow_scaling_eta_ratios_2p76TeV_0_10.csv \
   --fluidum-csv data/FluiduM/fluidum_double_ratio_points.csv \
   --n-thermal-terms "$NTHERM" \
   --n-quantum-terms "$NQUANT" \
   --tchem-list 0.136,0.156,0.176 \
-  --run-no-feeddown-refit \
+  --summary-rel-unc 0.05 \
+  --no-feeddown-fit-results outputs/current/blastwave_fit_2p76TeV_0_10_nofd.json \
   --other-outdir outputs/current \
   --outdir paper/figures
 
@@ -76,17 +81,19 @@ echo "[6/10] final eta/pi0 figure"
   --energy 2.76 \
   --centrality 0-10 \
   --kernels "$KERNELS" \
+  --particle-overlay "$PARTICLE_OVERLAY" \
   --fit-results data/fit_results/blastwave_fit_2p76TeV_0_10.json \
   --n-thermal-terms "$NTHERM" \
   --n-quantum-terms "$NQUANT" \
   --show-estimated-band \
-  --systematics-curves-csv outputs/current/systematics_double_ratio_curves_2p76TeV_0_10.csv \
+  --systematics-summary-json outputs/current/systematics_internal_summary_2p76TeV_0_10.json \
   --main-plot-only \
   --outdir paper/figures
 
 echo "[7/10] feeddown appendix figures"
 "$PYTHON_BIN" python/plot_feeddown_fractions.py \
   --kernels "$KERNELS" \
+  --particle-overlay "$PARTICLE_OVERLAY" \
   --fit-results data/fit_results/blastwave_fit_2p76TeV_0_10.json \
   --species k_plus,eta \
   --top-n 10 \

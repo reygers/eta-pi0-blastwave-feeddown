@@ -18,7 +18,9 @@ def main():
     )
     ap.add_argument("--energy", choices=["2.76", "5.02"], required=True)
     ap.add_argument("--centrality", required=True)
-    ap.add_argument("--kernels", default="kernels/kernels_scan06_alice.h5")
+    ap.add_argument("--kernels", default="kernels/kernels_scan09_alice.h5")
+    ap.add_argument("--decaytable", default="data/decaytables/decaytable_pythia8.dat")
+    ap.add_argument("--particle-overlay", action="append", default=[])
     ap.add_argument("--fit-results", default=None, help="Blast-wave fit JSON; defaults to data/fit_results/blastwave_fit_<energy>TeV_<cent>.json")
     ap.add_argument("--eta-norm-mode", choices=["thermal", "kaon-anchored"], default="thermal")
     ap.add_argument("--n-thermal-terms", type=int, default=None, help="Override n_thermal_terms from fit JSON.")
@@ -63,6 +65,8 @@ def main():
 
     with open(fit_path, "r", encoding="utf-8") as f:
         fr = json.load(f)
+    decaytable = str(fr.get("decaytable", args.decaytable))
+    particle_overlays = args.particle_overlay or fr.get("particle_overlays", [])
 
     pars = fr.get("params", {})
     tkin = float(pars["Tkin"])
@@ -89,6 +93,8 @@ def main():
         beta_s,
         n_profile,
         kernels_path=args.kernels,
+        decaytable=decaytable,
+        particle_overlays=particle_overlays,
         n_thermal_terms=n_thermal_terms,
         n_quantum_terms=n_quantum_terms,
         eta_scale=eta_scale,
@@ -139,6 +145,8 @@ def main():
                     bs,
                     ns,
                     kernels_path=args.kernels,
+                    decaytable=decaytable,
+                    particle_overlays=particle_overlays,
                     n_thermal_terms=n_thermal_terms,
                     n_quantum_terms=n_quantum_terms,
                     eta_scale=eta_scale,
@@ -191,6 +199,8 @@ def main():
                         bs,
                         ns,
                         kernels_path=args.kernels,
+                        decaytable=decaytable,
+                        particle_overlays=particle_overlays,
                         n_thermal_terms=n_thermal_terms,
                         n_quantum_terms=n_quantum_terms,
                         eta_scale=eta_scale,

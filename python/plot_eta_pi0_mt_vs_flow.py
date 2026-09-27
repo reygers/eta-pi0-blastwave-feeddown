@@ -169,7 +169,7 @@ def main():
     )
     plt.figure(figsize=(7.0, 5.0))
     plt.plot(pt, r_mt, color="C2", lw=2.0, label=r"$m_T$ scaling")
-    plt.plot(pt, fit_fn(pt, *fit_pars), color="orange", lw=2.0, label="fit: measured + pseudo data")
+    plt.plot(pt, fit_fn(pt, *fit_pars), color="orange", lw=2.0, label="double-ratio method")
     y_pp = eta_pi0_pp_fitfun(pt)
     m_pp = np.isfinite(y_pp)
     plt.plot(pt[m_pp], y_pp[m_pp], "--", lw=1.8, color="0.6", label=r"pp reference $(\eta/\pi^{0})_{pp}$")

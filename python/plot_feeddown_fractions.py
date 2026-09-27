@@ -12,7 +12,12 @@ import matplotlib.pyplot as plt
 from matplotlib.transforms import blended_transform_factory
 
 from kernels import load_kernel_file, load_species, bin_centers
-from blastwave_model import build_primary_spectra as bw_build_primary_spectra, rebin_spectrum
+from blastwave_model import (
+    build_primary_spectra as bw_build_primary_spectra,
+    load_masses as bw_load_masses,
+    require_mother_properties,
+    rebin_spectrum,
+)
 
 DEFAULT_SPECIES = ["pi_plus", "k_plus", "proton", "eta"]
 SPECIES_PID = {
@@ -281,6 +286,13 @@ def reorder_for_rowwise_multicol(handles, labels, ncol):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--kernels", default="kernels/kernels_scan03.h5")
+    ap.add_argument("--decaytable", default="data/decaytables/decaytable_pythia8.dat")
+    ap.add_argument(
+        "--particle-overlay",
+        action="append",
+        default=[],
+        help="Particle-data .cmnd overlay matching the kernel mothers; may be repeated.",
+    )
     ap.add_argument("--outdir", default="figures")
     ap.add_argument("--top-n", type=int, default=6)
     ap.add_argument("--tchem", type=float, default=0.156)
@@ -316,6 +328,7 @@ def main():
     if not xml:
         raise RuntimeError("Could not locate ParticleData.xml; set PYTHIA8DATA or ensure pythia8-config is available.")
     names, masses = parse_pythia_xml_names_masses(xml)
+    particle_overlays = list(args.particle_overlay)
     if args.fit_results:
         with open(args.fit_results, "r", encoding="utf-8") as f:
             fr = json.load(f)
@@ -326,6 +339,10 @@ def main():
         args.tchem = float(fr.get("tchem", args.tchem))
         args.n_thermal_terms = int(fr.get("n_thermal_terms", args.n_thermal_terms))
         args.n_quantum_terms = int(fr.get("n_quantum_terms", args.n_quantum_terms))
+        args.decaytable = str(fr.get("decaytable", args.decaytable))
+        if not particle_overlays:
+            particle_overlays = list(fr.get("particle_overlays", []))
+    masses.update(bw_load_masses(args.decaytable, overlay_paths=particle_overlays))
     species_list = parse_species_list(args.species)
     species_pid_overrides = parse_species_pid_overrides(args.species_pids)
 
@@ -351,6 +368,7 @@ def main():
             widths_d = np.diff(pt_edges_d)
 
             mother_ids = spec["mother_ids"]
+            require_mother_properties(mother_ids, masses, context=f"Kernel file '{args.kernels}'")
             primary = build_primary_spectra(
                 mother_ids,
                 pt_edges_m,

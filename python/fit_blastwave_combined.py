@@ -11,7 +11,7 @@ import numpy as np
 from scipy.optimize import least_squares
 
 from alice_data import load_combined_charged_hadron_spectrum
-from blastwave_model import blastwave_shape, load_masses, thermal_yield, rebin_spectrum
+from blastwave_model import blastwave_shape, load_masses, require_mother_properties, thermal_yield, rebin_spectrum
 from kernels import bin_centers, load_kernel_file, load_species
 
 
@@ -96,9 +96,16 @@ def compute_feeddown_binned(spec, primary_by_id):
     return fd_y / widths_d
 
 
-def build_model_raw(kernels, masses, params, n_thermal_terms=1, n_quantum_terms=1, include_feeddown=True):
+def build_model_raw(
+    kernels,
+    masses,
+    params,
+    tchem=0.156,
+    n_thermal_terms=1,
+    n_quantum_terms=1,
+    include_feeddown=True,
+):
     tkin, beta_s, n_profile = params
-    tchem = 0.156
     spec_any = kernels["pi_plus"]
     mids = spec_any["mother_ids"]
     pt_edges_m = spec_any["pt_edges_mother"]
@@ -158,6 +165,16 @@ def main():
     ap.add_argument("--energy", choices=["2.76", "5.02"], default="2.76")
     ap.add_argument("--centrality", required=True)
     ap.add_argument("--kernels", default="kernels/kernels_scan05.h5")
+    ap.add_argument("--decaytable", default="data/decaytables/decaytable_pythia8.dat")
+    ap.add_argument(
+        "--particle-overlay",
+        action="append",
+        default=[],
+        help="Particle-data .cmnd overlay matching the kernel mothers; may be repeated.",
+    )
+    ap.add_argument("--tchem", type=float, default=0.156, help="Chemical freeze-out temperature in GeV.")
+    ap.add_argument("--fixed-n", type=float, default=None, help="Fix the radial profile exponent n to this value.")
+    ap.add_argument("--variation-label", default="baseline", help="Label recorded in the fit-result JSON.")
     ap.add_argument("--outdir", default="figures")
     ap.add_argument("--results-out", default=None)
     ap.add_argument("--use-total-errors", action="store_true")
@@ -222,29 +239,46 @@ def main():
     ka_pt, ka_dat, ka_err = ka["pt"][m_ka], ka_y[m_ka], ka_e[m_ka]
     pr_pt, pr_dat, pr_err = pr["pt"][m_pr], pr_y[m_pr], pr_e[m_pr]
 
-    masses = load_masses("data/decaytables/decaytable_pythia8.dat")
+    overlay_paths = [str(p) for p in args.particle_overlay]
+    masses = load_masses(args.decaytable, overlay_paths=overlay_paths)
     with load_kernel_file(args.kernels) as f:
         kernels = {
             "pi_plus": load_species(f, "pi_plus"),
             "k_plus": load_species(f, "k_plus"),
             "proton": load_species(f, "proton"),
         }
+    mother_ids = np.unique(np.concatenate([spec["mother_ids"] for spec in kernels.values()])).astype(int)
+    require_mother_properties(mother_ids, masses, context=f"Kernel file '{args.kernels}'")
 
     centers = {k: bin_centers(v["pt_edges_daughter"]) for k, v in kernels.items()}
     charge_factor = 1.0 if args.no_charge_combined_factor else 2.0
-    x0 = np.array([0.10, 0.92, 0.75])
-    bounds = ([0.05, 0.2, 0.2], [0.2, 0.95, 3.0])
+    if args.fixed_n is not None and args.fixed_n <= 0:
+        raise ValueError("--fixed-n must be positive")
+    if args.fixed_n is None:
+        x0 = np.array([0.10, 0.92, 0.75])
+        bounds = ([0.05, 0.2, 0.2], [0.2, 0.95, 3.0])
+        param_order = ["Tkin", "beta_s", "n"]
+    else:
+        x0 = np.array([0.10, 0.92])
+        bounds = ([0.05, 0.2], [0.2, 0.95])
+        param_order = ["Tkin", "beta_s"]
     calls = {"n": 0}
 
+    def unpack_params(par):
+        if args.fixed_n is None:
+            return float(par[0]), float(par[1]), float(par[2])
+        return float(par[0]), float(par[1]), float(args.fixed_n)
+
     def residuals(par):
-        tkin, beta_s, nprof = par
+        tkin, beta_s, nprof = unpack_params(par)
         if tkin <= 0 or beta_s <= 0 or beta_s >= 0.999 or nprof <= 0:
             return np.full(pi_pt.size + ka_pt.size + pr_pt.size, 1e6)
 
         raw = build_model_raw(
             kernels,
             masses,
-            par,
+            (tkin, beta_s, nprof),
+            tchem=args.tchem,
             n_thermal_terms=args.n_thermal_terms,
             n_quantum_terms=args.n_quantum_terms,
             include_feeddown=(not args.no_feeddown),
@@ -268,17 +302,19 @@ def main():
             print(
                 f"iter {calls['n']}: chi2={chi2:.3f} "
                 f"tkin={tkin:.4f} beta_s={beta_s:.4f} n={nprof:.4f} "
-                f"norm_pi={npi:.3g} norm_k={nka:.3g} norm_p={npr:.3g}"
+                f"norm_pi={npi:.3g} norm_k={nka:.3g} norm_p={npr:.3g}",
+                flush=True,
             )
         return r
 
     res = least_squares(residuals, x0, bounds=bounds, max_nfev=args.max_nfev)
-    tkin, beta_s, nprof = [float(x) for x in res.x]
+    tkin, beta_s, nprof = unpack_params(res.x)
 
     raw = build_model_raw(
         kernels,
         masses,
-        res.x,
+        (tkin, beta_s, nprof),
+        tchem=args.tchem,
         n_thermal_terms=args.n_thermal_terms,
         n_quantum_terms=args.n_quantum_terms,
         include_feeddown=(not args.no_feeddown),
@@ -291,7 +327,7 @@ def main():
     npr = float(best_fit_scale(pr_dat, mpr, pr_err))
     chi2 = float(np.sum(res.fun * res.fun))
     npts = int(pi_pt.size + ka_pt.size + pr_pt.size)
-    npar = 3
+    npar = len(param_order)
     ndf = npts - npar
 
     cov = None
@@ -385,6 +421,11 @@ def main():
         "energy_tev": args.energy,
         "centrality": args.centrality,
         "kernel_file": args.kernels,
+        "decaytable": args.decaytable,
+        "particle_overlays": overlay_paths,
+        "variation_label": args.variation_label,
+        "tchem": float(args.tchem),
+        "fixed_n": None if args.fixed_n is None else float(args.fixed_n),
         "use_total_errors": bool(args.use_total_errors),
         "fit_ranges": {
             "pi_plus": [args.pt_pion_min, args.pt_pion_max],
@@ -405,7 +446,7 @@ def main():
     }
     if cov is not None:
         payload["covariance"] = cov.tolist()
-        payload["param_order"] = ["Tkin", "beta_s", "n"]
+        payload["param_order"] = param_order
 
     os.makedirs(os.path.dirname(out_json), exist_ok=True)
     with open(out_json, "w", encoding="utf-8") as f:
