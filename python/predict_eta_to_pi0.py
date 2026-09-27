@@ -19,6 +19,7 @@ from blastwave_model import (
     rebin_spectrum,
 )
 from kernels import load_kernel_file, load_species, compute_feeddown_binned, bin_centers
+from paper_plot_style import PAPER_RC_PARAMS
 
 M_ETA = 0.547862
 M_PI0 = 0.134977
@@ -593,14 +594,7 @@ def main():
     ctag = args.centrality.replace("-", "_")
     out_path = os.path.join(args.outdir, f"eta_to_pi0_data_{energy_tag}_{ctag}.pdf")
 
-    plt.rcParams.update(
-        {
-            "axes.labelsize": 15,
-            "xtick.labelsize": 13,
-            "ytick.labelsize": 13,
-            "legend.fontsize": 12,
-        }
-    )
+    plt.rcParams.update(PAPER_RC_PARAMS)
     plt.figure(figsize=(7, 5))
     plt.errorbar(pt, ratio, yerr=yerr, fmt="o", ms=4, capsize=2, label="data")
     overlay_x = overlay_y = None
@@ -1198,9 +1192,9 @@ def main():
         rf"ALICE Pb–Pb $\sqrt{{s_{{NN}}}}={args.energy}$ TeV" + "\n"
         rf"{args.centrality.replace('-', '–')}%"
     )
-    plt.text(0.03, 0.97, ttl, transform=plt.gca().transAxes, va="top", ha="left", fontsize=11)
+    plt.text(0.03, 0.97, ttl, transform=plt.gca().transAxes, va="top", ha="left", fontsize=14)
     plt.grid(alpha=0.3)
-    plt.legend(frameon=False, loc="lower right")
+    plt.legend(frameon=False, loc="lower right", fontsize=12, labelspacing=0.20)
     plt.tight_layout()
     plt.savefig(out_path, dpi=160)
     plt.close()

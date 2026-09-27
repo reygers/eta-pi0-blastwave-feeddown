@@ -10,6 +10,7 @@ import numpy as np
 
 from alice_data import load_combined_charged_hadron_spectrum
 from blastwave_model import load_masses, thermal_yield
+from paper_plot_style import PAPER_RC_PARAMS
 
 
 MASS = {
@@ -411,14 +412,7 @@ def main():
     ctag = args.centrality.replace("-", "_")
     etag = args.energy.replace(".", "p")
     if args.paper_style:
-        plt.rcParams.update(
-            {
-                "axes.labelsize": 15,
-                "xtick.labelsize": 13,
-                "ytick.labelsize": 13,
-                "legend.fontsize": 12,
-            }
-        )
+        plt.rcParams.update(PAPER_RC_PARAMS)
 
     # Plot 1: chi2/ndf scan vs beta
     p1 = os.path.join(args.outdir, f"flow_scaling_beta_scan_{etag}TeV_{ctag}.pdf")
@@ -459,7 +453,7 @@ def main():
                 color="C3",
                 ls="--",
                 lw=2,
-                label=r"Tsallis-like fit: $A(1+m_T^*/(nT))^{-n}$",
+                label="Tsallis-like fit:\n" + r"$A(1+m_T^*/(nT))^{-n}$",
             )
     smooth_model = None
     if args.smooth_f == "exp" and exp_pars is not None:
@@ -510,11 +504,11 @@ def main():
         transform=plt.gca().transAxes,
         va="top",
         ha="right",
-        fontsize=11,
+        fontsize=14,
         bbox=dict(facecolor="white", alpha=0.75, edgecolor="none", pad=2.0),
     )
     plt.grid(alpha=0.3)
-    plt.legend(frameon=False, loc="lower left", fontsize=(11 if args.paper_style else 8))
+    plt.legend(frameon=False, loc="lower left", fontsize=(13 if args.paper_style else 8))
     plt.tight_layout()
     plt.savefig(p2, dpi=160)
     plt.close()

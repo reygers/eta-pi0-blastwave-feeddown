@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from predict_eta_to_pi0 import build_model_ratios_kernel_total
+from paper_plot_style import PAPER_RC_PARAMS
 
 
 def main():
@@ -106,14 +107,7 @@ def main():
     m = np.isfinite(pt) & np.isfinite(dr_model)
     cent_label = args.centrality.replace("-", "–")
     plt.figure(figsize=(7, 5))
-    plt.rcParams.update(
-        {
-            "axes.labelsize": 15,
-            "xtick.labelsize": 13,
-            "ytick.labelsize": 13,
-            "legend.fontsize": 12,
-        }
-    )
+    plt.rcParams.update(PAPER_RC_PARAMS)
     plt.plot(pt[m], dr_model[m], "-", lw=2.2, color="C0", label=r"$(\eta/\pi^0)/(K^+/\pi^+)$")
     if args.show_components:
         mk = np.isfinite(pt) & np.isfinite(eta_over_k_model)
@@ -266,7 +260,7 @@ def main():
         rf"$\beta_s={beta_s:.4f}$" + "\n"
         rf"$n={n_profile:.4f}$"
     )
-    plt.text(0.6, 0.56, info, transform=plt.gca().transAxes, va="top", ha="left", fontsize=12)
+    plt.text(0.56, 0.65, info, transform=plt.gca().transAxes, va="top", ha="left", fontsize=14)
     plt.grid(alpha=0.3)
     plt.legend(frameon=False, loc="lower left", bbox_to_anchor=(0.49, 0.0))
     plt.tight_layout()

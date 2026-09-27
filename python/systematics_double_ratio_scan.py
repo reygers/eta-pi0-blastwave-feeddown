@@ -14,6 +14,7 @@ import numpy as np
 
 from alice_data import load_combined_charged_hadron_spectrum
 from predict_eta_to_pi0 import build_model_ratios, build_model_ratios_kernel_total
+from paper_plot_style import PAPER_RC_PARAMS
 
 
 def load_fit(path: str):
@@ -358,14 +359,7 @@ def main():
     other_outdir = Path(args.other_outdir) if args.other_outdir else outdir
     other_outdir.mkdir(parents=True, exist_ok=True)
     write_aux = not args.summary_only
-    plt.rcParams.update(
-        {
-            "axes.labelsize": 15,
-            "xtick.labelsize": 13,
-            "ytick.labelsize": 13,
-            "legend.fontsize": 12,
-        }
-    )
+    plt.rcParams.update(PAPER_RC_PARAMS)
 
     flow_csv = args.flow_csv
     if flow_csv is None:
@@ -866,7 +860,7 @@ def main():
     plt.ylabel(r"$(\eta/\pi^0)/(K^+/\pi^+)$")
     plt.xlim(float(args.pt_min), x_common_max)
     plt.grid(alpha=0.3)
-    plt.legend(frameon=False, fontsize=10.5)
+    plt.legend(frameon=False, fontsize=13, labelspacing=0.20)
     plt.tight_layout()
     plt.savefig(out5)
     plt.close()

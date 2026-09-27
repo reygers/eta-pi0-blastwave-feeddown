@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 from scipy.special import erf
+from paper_plot_style import PAPER_RC_PARAMS
 
 
 def model_eta_pi0(pt, A, beta, T, p0, d, r=0.487, m_pi=0.135, m_eta=0.548):
@@ -81,14 +82,7 @@ def main():
     ap.add_argument("--outdir", default="outputs/current")
     args = ap.parse_args()
 
-    plt.rcParams.update(
-        {
-            "axes.labelsize": 15,
-            "xtick.labelsize": 13,
-            "ytick.labelsize": 13,
-            "legend.fontsize": 12,
-        }
-    )
+    plt.rcParams.update(PAPER_RC_PARAMS)
 
     p7, y7, st7, sy7 = parse_hepdata_table(
         os.path.join(args.data_dir, "HEPData-ins1116147-v1-Table_4.csv"),

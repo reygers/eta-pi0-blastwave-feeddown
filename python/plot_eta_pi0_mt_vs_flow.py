@@ -9,6 +9,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 
 from predict_eta_to_pi0 import load_eta_pi0_data, make_model_blast_switch_fixed_r, eta_pi0_pp_fitfun
+from paper_plot_style import PAPER_RC_PARAMS
 
 
 def pi0_spectrum_eq3(pt, mass, ae, te, a, t, n):
@@ -159,14 +160,7 @@ def main():
         include_pseudo_bw_unc=False,
     )
 
-    plt.rcParams.update(
-        {
-            "axes.labelsize": 15,
-            "xtick.labelsize": 13,
-            "ytick.labelsize": 13,
-            "legend.fontsize": 12,
-        }
-    )
+    plt.rcParams.update(PAPER_RC_PARAMS)
     plt.figure(figsize=(7.0, 5.0))
     plt.plot(pt, r_mt, color="C2", lw=2.0, label=r"$m_T$ scaling")
     plt.plot(pt, fit_fn(pt, *fit_pars), color="orange", lw=2.0, label="double-ratio method")
@@ -193,7 +187,7 @@ def main():
     plt.xlabel(r"$p_T$ (GeV/$c$)")
     plt.ylabel(r"$\eta/\pi^0$")
     ttl = rf"ALICE Pb–Pb $\sqrt{{s_{{NN}}}}={args.energy}$ TeV" + "\n" + rf"{args.centrality.replace('-', '–')}%"
-    plt.text(0.03, 0.97, ttl, transform=plt.gca().transAxes, va="top", ha="left", fontsize=11)
+    plt.text(0.03, 0.97, ttl, transform=plt.gca().transAxes, va="top", ha="left", fontsize=14)
     plt.grid(alpha=0.3)
     plt.legend(frameon=False, loc="lower right")
     plt.tight_layout()

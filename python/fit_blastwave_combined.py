@@ -13,6 +13,7 @@ from scipy.optimize import least_squares
 from alice_data import load_combined_charged_hadron_spectrum
 from blastwave_model import blastwave_shape, load_masses, require_mother_properties, thermal_yield, rebin_spectrum
 from kernels import bin_centers, load_kernel_file, load_species
+from paper_plot_style import PAPER_RC_PARAMS
 
 
 def invariant_to_dndpt(pt, y_inv):
@@ -350,14 +351,7 @@ def main():
     scale_k, scale_p = 8.0, 30.0
     ms = 5.0
     cent_label = args.centrality.replace("-", "–")
-    plt.rcParams.update(
-        {
-            "axes.labelsize": 15,
-            "xtick.labelsize": 13,
-            "ytick.labelsize": 13,
-            "legend.fontsize": 12,
-        }
-    )
+    plt.rcParams.update(PAPER_RC_PARAMS)
 
     plt.errorbar(pi["pt"], pi_y, yerr=pi_e, fmt="o", ms=ms, color="C0", label=r"$\pi^\pm$")
     plt.errorbar(ka["pt"], ka_y * scale_k, yerr=ka_e * scale_k, fmt="o", ms=ms, color="C1", label=r"$K^\pm \times 8$")
@@ -390,19 +384,19 @@ def main():
     plt.xlim(0.0, 3.0)
     plt.xlabel(r"$p_T$ (GeV/$c$)")
     plt.ylabel(r"$\mathrm{d}^2N/\mathrm{d}p_T\,\mathrm{d}y$ ((GeV/$c$)$^{-1}$)")
-    info = (
-        rf"Pb–Pb $\sqrt{{s_{{NN}}}}={args.energy}$ TeV, {cent_label}%" + "\n"
-        + (r"model: primary only (no feeddown)" if args.no_feeddown else r"model: primary + feeddown")
-        + "\n"
+    info = rf"Pb–Pb $\sqrt{{s_{{NN}}}}={args.energy}$ TeV, {cent_label}%" + "\n"
+    if args.no_feeddown:
+        info += "model: primary only (no feeddown)\n"
+    info += (
         rf"$T_{{\mathrm{{kin}}}}={tkin:.4f}$ GeV, $\beta_s={beta_s:.4f}$, $n={nprof:.4f}$" + "\n"
         r"fit ranges (GeV/$c$):" + "\n"
         rf"$\pi^\pm$: {args.pt_pion_min:.1f}–{args.pt_pion_max:.1f}, "
         rf"$K^\pm$: {args.pt_kaon_min:.1f}–{args.pt_kaon_max:.1f}, "
         rf"$p+\bar p$: {args.pt_proton_min:.1f}–{args.pt_proton_max:.1f}"
     )
-    plt.text(0.33, 0.97, info, transform=plt.gca().transAxes, va="top", ha="left", fontsize=12)
+    plt.text(0.25, 0.97, info, transform=plt.gca().transAxes, va="top", ha="left", fontsize=13)
     # Keep legend directly below the in-plot info text to avoid overlapping data points.
-    plt.legend(fontsize=12, frameon=False, loc="upper left", bbox_to_anchor=(0.65, 0.69))
+    plt.legend(fontsize=13, frameon=False, loc="upper left", bbox_to_anchor=(0.61, 0.72))
     plt.tight_layout()
     plt.savefig(out_plot, dpi=150)
     print(f"Wrote {out_plot}")

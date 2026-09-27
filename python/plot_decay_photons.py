@@ -22,6 +22,7 @@ from fit_flow_scaling import (
 )
 from kernels import bin_centers, load_kernel_file, load_species
 from predict_eta_to_pi0 import assigned_piecewise_rel_band, model_blast_switch
+from paper_plot_style import PAPER_RC_PARAMS
 
 
 PDG_LATEX = {
@@ -277,14 +278,7 @@ def main():
     if low_pt_model_rel_unc is None:
         low_pt_model_rel_unc = 0.05
 
-    plt.rcParams.update(
-        {
-            "axes.labelsize": 15,
-            "xtick.labelsize": 13,
-            "ytick.labelsize": 13,
-            "legend.fontsize": 12,
-        }
-    )
+    plt.rcParams.update(PAPER_RC_PARAMS)
 
     cocktail_pids = parse_pid_list(args.photon_cocktail_particles)
     if not cocktail_pids:
@@ -485,12 +479,12 @@ def main():
         # Half-width of eta fraction band = relative impact scale to compare to 5%.
         eta_impact = 0.5 * np.abs(eta_hi - eta_lo)
 
-    ax.set_ylabel(r"decay photon from $X$ / total")
+    ax.set_ylabel(r"decay $\gamma$ from $X$ / total")
     ax.set_xlim(0.0, float(np.nanmax(pt_d)) if np.any(np.isfinite(pt_d)) else 6.0)
     ax.set_ylim(0.0, 1.0)
     ax.grid(alpha=0.3)
     ttl = rf"Pb–Pb $\sqrt{{s_{{NN}}}}={args.energy}$ TeV, {args.centrality.replace('-', '–')}%"
-    ax.text(0.50, 0.66, ttl, transform=ax.transAxes, va="top", ha="left", fontsize=11)
+    ax.text(0.40, 0.66, ttl, transform=ax.transAxes, va="top", ha="left", fontsize=14)
 
     # Lower panel: eta uncertainty impact and theory direct/decay reference.
     direct_over_decay = None
@@ -630,16 +624,22 @@ def main():
     axb.set_xlabel(r"$p_T^\gamma$ (GeV/$c$)")
     axb.set_ylim(0.0, 0.20)
     axb.grid(alpha=0.3)
-    axb.legend(frameon=False, fontsize=9.5, loc="upper right")
+    axb.legend(
+        frameon=False,
+        fontsize=13,
+        loc="upper right",
+        bbox_to_anchor=(0.99, 1.03),
+        labelspacing=0.20,
+    )
 
     ax.legend(
         frameon=False,
-        fontsize=9.5,
+        fontsize=13,
         ncol=2,
         loc="center",
         bbox_to_anchor=(0.52, 0.44),
     )
-    fig.tight_layout()
+    fig.tight_layout(h_pad=2.0)
 
     etag = args.energy.replace(".", "p") + "TeV"
     ctag = args.centrality.replace("-", "_")
