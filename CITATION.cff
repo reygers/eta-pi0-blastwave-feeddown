@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite the associated paper and the software
+  release.
+title: Blast-Wave Feeddown Toolkit for Low-pT Eta/Pi0 Studies
+type: software
+authors:
+  - family-names: Reygers
+    given-names: Klaus
+  - family-names: Kirchner
+    given-names: Andreas
+  - family-names: Mazeliauskas
+    given-names: Aleksas
+repository-code: https://github.com/reygers/eta-pi0-blastwave-feeddown
+url: https://github.com/reygers/eta-pi0-blastwave-feeddown/releases/tag/journal-submission-v2.1-post-acceptance
+license: MIT
+version: journal-submission-v2.1-post-acceptance
+date-released: 2026-09-27
+keywords:
+  - heavy-ion collisions
+  - blast-wave model
+  - hadronic feeddown
+  - eta-to-pi0 ratio
+  - direct photons
+preferred-citation:
+  type: article
+  title: >-
+    Constraining the Low-pT Eta/Pi0 Ratio for Direct-Photon Analyses with
+    Blast-Wave Fits to Pi, K, and p Spectra
+  authors:
+    - family-names: Reygers
+      given-names: Klaus
+    - family-names: Kirchner
+      given-names: Andreas
+    - family-names: Mazeliauskas
+      given-names: Aleksas
+  journal: Physical Review C
+  year: 2026
+  doi: 10.48550/arXiv.2606.12619
+  url: https://arxiv.org/abs/2606.12619
+  notes: Accepted for publication

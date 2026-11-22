@@ -7,6 +7,14 @@ This repository contains the code used to build and apply hadronic feeddown kern
 - constructing a low-`p_T` `eta/pi0` parameterization and propagating it to a decay-photon cocktail
 - reproducing the main figures used in the paper
 
+## Associated Paper
+
+This repository accompanies:
+
+K. Reygers, A. Kirchner, and A. Mazeliauskas, “Constraining the Low-$p_T$ $\eta/\pi^0$ Ratio for Direct-Photon Analyses with Blast-Wave Fits to $\pi$, $K$, and $p$ Spectra,” accepted for publication in *Physical Review C*, [arXiv:2606.12619](https://arxiv.org/abs/2606.12619), [doi:10.48550/arXiv.2606.12619](https://doi.org/10.48550/arXiv.2606.12619).
+
+The code snapshot corresponding to the accepted manuscript is tagged [`journal-submission-v2.1-post-acceptance`](https://github.com/reygers/eta-pi0-blastwave-feeddown/releases/tag/journal-submission-v2.1-post-acceptance). Please cite the paper and this software repository when using the workflow. GitHub citation metadata are provided in `CITATION.cff`.
+
 ## Repository Layout
 
 - `kernel_factory/`
@@ -181,10 +189,18 @@ Large generated files are not ideal for a GitHub repository. In particular:
 
 should typically be ignored or distributed separately.
 
+The accepted-paper release provides the two baseline kernels required by the documented workflow as release assets:
+
+- `kernels_scan09_alice.h5` for the hadron/feeddown analysis
+- `kernels_scan01_decay_photon_components.h5` for the decay-photon cocktail
+
+After downloading them, place both files in `kernels/`. Other kernel scans are development products and are not required to reproduce the accepted-paper baseline.
+
 `outputs/` is the shared generated-work directory for intermediate CSV, JSON, and non-curated plot products passed between scripts in the workflow.
 
 ## Release Notes
 
+- The accepted-paper snapshot is tagged `journal-submission-v2.1-post-acceptance`.
 - The cleaned workflow lives at the repository top level.
 - The repository is released under the MIT License; see `LICENSE`.
 

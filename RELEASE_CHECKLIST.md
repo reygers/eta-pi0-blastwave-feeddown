@@ -1,20 +1,24 @@
-# GitHub Release Checklist
+# Publication and Archival Checklist
 
-This checklist captures the remaining repository-level tasks before making the cleaned tree public.
+This checklist records the repository state associated with the accepted manuscript.
 
-## Must Decide
+## Completed
 
-- decide whether `paper/` should remain in the public repository as full manuscript source or move to a separate paper repo later
+- public-facing workflow and dependency list are documented in `README.md`
+- accepted-paper code is tagged `journal-submission-v2.1-post-acceptance`
+- GitHub citation metadata are provided in `CITATION.cff`
+- the accepted-paper release contains the two baseline HDF5 kernels required by the documented workflow
+- generated figures, intermediate outputs, local environments, and LaTeX build products remain ignored
+- the repository uses the MIT License
 
-## Strongly Recommended
+## Before Announcing the Repository
 
-- verify the main public scripts run from a clean environment using `requirements.txt`
-- review whether any kernel `.h5` files should stay out of GitHub and be distributed separately
-- review whether any data files have external attribution or redistribution requirements that should be cited in `README.md`
-- create the initial git repository and first commit from this cleaned directory
+- make the GitHub repository public
+- verify the release and both kernel assets are visible without authentication
+- update the paper citation in `README.md` and `CITATION.cff` when the journal DOI, volume, and article number are assigned
 
-## Optional Cleanup
+## Optional Follow-up
 
-- remove local generated figures that are already ignored
-- remove LaTeX build products in `paper/`
-- add a `CITATION.cff` if you want GitHub citation metadata on the repository front page
+- archive the release with Zenodo and add the resulting software DOI to `CITATION.cff`
+- run the complete workflow once from a clean environment using `requirements.txt`
+- review third-party input-data attribution and redistribution terms
